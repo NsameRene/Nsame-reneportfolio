@@ -17,6 +17,7 @@ import CourseDetails from './pages/CourseDetails.tsx';
 import Blog from './pages/Blog.tsx';
 import Article from './pages/Article.tsx';
 import Testimonials from './pages/Testimonials.tsx';
+import Projects from './pages/Projects.tsx';
 
 function Layout({ children }: { children: React.ReactNode }) {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -24,6 +25,7 @@ function Layout({ children }: { children: React.ReactNode }) {
     { name: 'Home', path: '/' },
     { name: 'About', path: '/about' },
     { name: 'CV', path: '/cv' },
+    { name: 'Projects', path: '/projects' },
     { name: 'Courses', path: '/courses' },
     { name: 'Gallery', path: '/gallery' },
     { name: 'Blog', path: '/blog' },
@@ -91,11 +93,13 @@ function Layout({ children }: { children: React.ReactNode }) {
       <footer className="bg-white border-t border-slate-200 mt-24">
         <div className="max-w-7xl mx-auto py-16 px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center">
           <div className="flex items-center space-x-3 mb-6 md:mb-0">
-            <img 
-              src="https://api.dicebear.com/7.x/notionists/svg?seed=NsameReneTamjong&backgroundColor=e2e8f0" 
-              alt="Nsame Rene" 
-              className="w-8 h-8 rounded-full grayscale opacity-70"
-            />
+            <Link to="/admin">
+              <img 
+                src="https://api.dicebear.com/7.x/notionists/svg?seed=NsameReneTamjong&backgroundColor=e2e8f0" 
+                alt="Nsame Rene" 
+                className="w-8 h-8 rounded-full grayscale opacity-70 hover:opacity-100 hover:grayscale-0 transition-all cursor-pointer"
+              />
+            </Link>
             <p className="text-slate-500 text-sm font-medium">© {new Date().getFullYear()} Nsame Rene. Built with precision.</p>
           </div>
           <div className="flex space-x-6">
@@ -125,6 +129,7 @@ export default function App() {
         <Route path="/" element={<Home />} />
         <Route path="/about" element={<About />} />
         <Route path="/cv" element={<CV />} />
+        <Route path="/projects" element={<Projects />} />
         <Route path="/skills" element={<Skills />} />
         <Route path="/experience" element={<Experience />} />
         <Route path="/gallery" element={<Gallery />} />

@@ -1,5 +1,6 @@
 import { motion } from 'motion/react';
 import { Download, Target, Lightbulb } from 'lucide-react';
+import { Link } from 'react-router';
 import ScrollReveal from '../components/ScrollReveal';
 
 export default function About() {
@@ -50,9 +51,9 @@ export default function About() {
           </p>
         </div>
         <div className="flex-shrink-0">
-          <a href="/Nsame_Rene_Tamjong_CV.pdf" download="Nsame_Rene_Tamjong_CV.pdf" target="_blank" rel="noopener noreferrer" className="inline-flex items-center px-6 py-3 rounded-full bg-white text-slate-900 font-medium hover:bg-slate-100 transition-colors shadow-sm">
+          <Link to="/cv" className="inline-flex items-center px-6 py-3 rounded-full bg-white text-slate-900 font-medium hover:bg-slate-100 transition-colors shadow-sm">
             <Download className="mr-2 w-5 h-5" /> Download Full CV
-          </a>
+          </Link>
         </div>
       </ScrollReveal>
     </div>

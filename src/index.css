@@ -38,3 +38,20 @@
 @utility bg-300% {
   background-size: 300% 300%;
 }
+
+@media print {
+  @page {
+    margin: 0;
+  }
+  nav, footer, .print-hidden {
+    display: none !important;
+  }
+  body, html, #root {
+    background: white !important;
+    height: auto !important;
+  }
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+}

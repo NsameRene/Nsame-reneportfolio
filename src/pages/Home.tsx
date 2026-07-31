@@ -97,9 +97,9 @@ export default function Home() {
               <Link to="/projects" className="inline-flex justify-center items-center px-10 py-5 rounded-full bg-slate-900 text-white font-bold text-lg hover:bg-indigo-600 transition-all hover:shadow-xl hover:shadow-indigo-500/20 hover:-translate-y-1 active:translate-y-0 w-full sm:w-auto">
                 View My Work <ArrowRight className="ml-3 w-6 h-6" />
               </Link>
-              <a href="/Nsame_Rene_Tamjong_CV.pdf" download="Nsame_Rene_Tamjong_CV.pdf" target="_blank" rel="noopener noreferrer" className="inline-flex justify-center items-center px-10 py-5 rounded-full bg-white text-slate-900 font-bold text-lg shadow-sm border border-slate-200 hover:border-slate-300 hover:bg-slate-50 transition-all hover:-translate-y-1 w-full sm:w-auto">
+              <Link to="/cv" className="inline-flex justify-center items-center px-10 py-5 rounded-full bg-white text-slate-900 font-bold text-lg shadow-sm border border-slate-200 hover:border-slate-300 hover:bg-slate-50 transition-all hover:-translate-y-1 w-full sm:w-auto">
                 <Download className="mr-3 w-6 h-6" /> Download CV
-              </a>
+              </Link>
             </motion.div>
           </div>
 

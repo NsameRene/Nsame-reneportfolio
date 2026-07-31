@@ -1,19 +1,22 @@
 import React from 'react';
-import { Phone, Mail, MapPin, Globe, Download } from 'lucide-react';
+import { Phone, Mail, MapPin, Globe, Download, ExternalLink, ShoppingCart, Users } from 'lucide-react';
 
 export default function CV() {
   return (
-    <div className="py-12 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto">
-      <div className="flex justify-end mb-6">
-        <button className="inline-flex items-center justify-center px-6 py-3 bg-indigo-600 text-white font-medium rounded-full hover:bg-indigo-700 transition-colors shadow-sm">
+    <div className="py-12 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto print:p-0 print:m-0 print:max-w-none">
+      <div className="flex justify-end mb-6 print-hidden">
+        <button 
+          onClick={() => window.print()}
+          className="inline-flex items-center justify-center px-6 py-3 bg-indigo-600 text-white font-medium rounded-full hover:bg-indigo-700 transition-colors shadow-sm"
+        >
           <Download className="w-5 h-5 mr-2" />
           Download PDF
         </button>
       </div>
 
-      <div className="bg-white shadow-2xl overflow-hidden flex flex-col md:flex-row min-h-[1056px]">
+      <div id="cv-document" className="bg-white shadow-2xl overflow-hidden flex flex-col md:flex-row min-h-[1056px] print:shadow-none print:w-[210mm] print:mx-auto">
         {/* Left Column */}
-        <div className="w-full md:w-[35%] bg-slate-900 text-white p-8 md:p-10 flex flex-col">
+        <div className="w-full md:w-[35%] bg-slate-900 text-white p-8 md:p-10 flex flex-col print:w-[35%] print:bg-slate-900 print:text-white" style={{ WebkitPrintColorAdjust: 'exact', printColorAdjust: 'exact' }}>
           {/* Profile Image */}
           <div className="mb-10 flex justify-center">
             <div className="w-48 h-48 rounded-full border-4 border-slate-300 overflow-hidden relative shadow-lg">
@@ -160,6 +163,44 @@ export default function CV() {
                   <li>Built interactive single-page applications using React and Redux for state management.</li>
                   <li>Optimized web applications for maximum speed and scalability, achieving a 90+ Lighthouse score consistently.</li>
                 </ul>
+              </div>
+            </div>
+          </div>
+
+          {/* Projects */}
+          <div className="mb-10">
+            <h2 className="text-2xl font-bold tracking-widest uppercase mb-4 text-slate-800">Projects</h2>
+            <div className="w-full h-0.5 bg-slate-800 mb-6"></div>
+            
+            <div className="relative border-l-2 border-slate-300 pl-8 space-y-8 ml-3 mt-4">
+              <div className="relative group">
+                <div className="absolute w-8 h-8 bg-white rounded-lg -left-[3.1rem] -top-1 flex items-center justify-center shadow-sm border border-slate-200 group-hover:border-indigo-300 group-hover:bg-indigo-50 transition-colors z-10">
+                  <ShoppingCart className="w-4 h-4 text-slate-600 group-hover:text-indigo-600" />
+                </div>
+                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-baseline mb-1">
+                  <h3 className="text-lg font-bold text-slate-800">E-Commerce Platform Redesign</h3>
+                  <a href="#" className="inline-flex items-center text-xs font-bold text-indigo-600 hover:text-indigo-700 bg-indigo-50 hover:bg-indigo-100 px-3 py-1.5 rounded-full transition-colors print:hidden mt-2 sm:mt-0">
+                    <ExternalLink className="w-3.5 h-3.5 mr-1.5" /> Live View
+                  </a>
+                </div>
+                <p className="text-sm text-slate-600 mt-2">
+                  Led the frontend redesign of a major e-commerce platform, improving load times by 40% and increasing conversion rates by 15%.
+                </p>
+              </div>
+
+              <div className="relative group">
+                <div className="absolute w-8 h-8 bg-white rounded-lg -left-[3.1rem] -top-1 flex items-center justify-center shadow-sm border border-slate-200 group-hover:border-indigo-300 group-hover:bg-indigo-50 transition-colors z-10">
+                  <Users className="w-4 h-4 text-slate-600 group-hover:text-indigo-600" />
+                </div>
+                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-baseline mb-1">
+                  <h3 className="text-lg font-bold text-slate-800">Real-time Collab Whiteboard</h3>
+                  <a href="#" className="inline-flex items-center text-xs font-bold text-indigo-600 hover:text-indigo-700 bg-indigo-50 hover:bg-indigo-100 px-3 py-1.5 rounded-full transition-colors print:hidden mt-2 sm:mt-0">
+                    <ExternalLink className="w-3.5 h-3.5 mr-1.5" /> Live View
+                  </a>
+                </div>
+                <p className="text-sm text-slate-600 mt-2">
+                  Built a real-time collaborative workspace allowing remote teams to brainstorm using a shared canvas with multiple concurrent users.
+                </p>
               </div>
             </div>
           </div>

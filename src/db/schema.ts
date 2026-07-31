@@ -3,8 +3,8 @@ import { integer, pgTable, serial, text, timestamp, boolean } from 'drizzle-orm/
 
 export const users = pgTable('users', {
   id: serial('id').primaryKey(),
-  uid: text('uid').notNull().unique(), // Firebase Auth UID
-  email: text('email').notNull(),
+  email: text('email').notNull().unique(),
+  password: text('password').notNull(),
   name: text('name'),
   role: text('role').default('user'),
   createdAt: timestamp('created_at').defaultNow(),
@@ -57,6 +57,36 @@ export const certificates = pgTable('certificates', {
   issuer: text('issuer').notNull(),
   date: text('date').notNull(),
   link: text('link'),
+});
+
+export const education = pgTable('education', {
+  id: serial('id').primaryKey(),
+  institution: text('institution').notNull(),
+  degree: text('degree').notNull(),
+  startDate: text('start_date').notNull(),
+  endDate: text('end_date'),
+  description: text('description'),
+});
+
+export const courses = pgTable('courses', {
+  id: serial('id').primaryKey(),
+  title: text('title').notNull(),
+  description: text('description').notNull(),
+  imageUrl: text('image_url'),
+  link: text('link'),
+});
+
+export const quotes = pgTable('quotes', {
+  id: serial('id').primaryKey(),
+  text: text('text').notNull(),
+  author: text('author').notNull(),
+});
+
+export const gallery = pgTable('gallery', {
+  id: serial('id').primaryKey(),
+  title: text('title').notNull(),
+  imageUrl: text('image_url').notNull(),
+  createdAt: timestamp('created_at').defaultNow(),
 });
 
 export const contact_messages = pgTable('contact_messages', {
