@@ -82,7 +82,7 @@ export default function Blog() {
                 {post.excerpt}
               </p>
               
-              <Link to="#" className="inline-flex items-center text-sm font-bold text-slate-900 group-hover:text-indigo-600 transition-colors mt-auto">
+              <Link to={`/blog/${post.id}`} className="inline-flex items-center text-sm font-bold text-slate-900 group-hover:text-indigo-600 transition-colors mt-auto">
                 Read Article <ArrowRight className="ml-2 w-4 h-4" />
               </Link>
             </div>

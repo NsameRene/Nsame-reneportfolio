@@ -4,7 +4,7 @@ import { Github, Linkedin, Mail, Menu, X } from 'lucide-react';
 import React, { useState } from 'react';
 
 import Home from './pages/Home.tsx';
-import Projects from './pages/Projects.tsx';
+import CV from './pages/CV.tsx';
 import Admin from './pages/Admin.tsx';
 
 import About from './pages/About.tsx';
@@ -13,14 +13,17 @@ import Experience from './pages/Experience.tsx';
 import Contact from './pages/Contact.tsx';
 import Gallery from './pages/Gallery.tsx';
 import Courses from './pages/Courses.tsx';
+import CourseDetails from './pages/CourseDetails.tsx';
 import Blog from './pages/Blog.tsx';
+import Article from './pages/Article.tsx';
+import Testimonials from './pages/Testimonials.tsx';
 
 function Layout({ children }: { children: React.ReactNode }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const navLinks = [
     { name: 'Home', path: '/' },
     { name: 'About', path: '/about' },
-    { name: 'Projects', path: '/projects' },
+    { name: 'CV', path: '/cv' },
     { name: 'Courses', path: '/courses' },
     { name: 'Gallery', path: '/gallery' },
     { name: 'Blog', path: '/blog' },
@@ -121,12 +124,15 @@ export default function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/about" element={<About />} />
-        <Route path="/projects" element={<Projects />} />
+        <Route path="/cv" element={<CV />} />
         <Route path="/skills" element={<Skills />} />
         <Route path="/experience" element={<Experience />} />
         <Route path="/gallery" element={<Gallery />} />
         <Route path="/courses" element={<Courses />} />
+        <Route path="/courses/:id" element={<CourseDetails />} />
         <Route path="/blog" element={<Blog />} />
+        <Route path="/blog/:id" element={<Article />} />
+        <Route path="/testimonials" element={<Testimonials />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/admin" element={<Admin />} />
       </Routes>

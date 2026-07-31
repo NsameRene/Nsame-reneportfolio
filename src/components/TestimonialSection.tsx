@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { X, Plus, List } from 'lucide-react';
+import { X, Plus, List, Star } from 'lucide-react';
+import { Link } from 'react-router';
 
 interface Testimonial {
   id: string;
@@ -11,23 +12,33 @@ interface Testimonial {
 }
 
 const initialTestimonials: Testimonial[] = [
-  { id: '1', name: "Sarah Jenkins", role: "CEO at TechFlow", text: "Nsame completely transformed our digital presence. His full-stack expertise and attention to UI details brought our vision to life faster than we imagined possible.", date: Date.now() - 100000 },
-  { id: '2', name: "Dr. Alistair Webb", role: "Director of Education", text: "EduIgnite has revolutionized how we manage our institution. Nsame's background in education combined with his technical skills made this the perfect platform for us.", date: Date.now() - 200000 },
+  { id: '1', name: "James D. Kelly", role: "Founder", text: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s.", date: Date.now() - 100000 },
+  { id: '2', name: "Joanna S. Brown", role: "CEO", text: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s.", date: Date.now() - 200000 },
+  { id: '3', name: "Jason E. George", role: "Manager", text: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s.", date: Date.now() - 300000 },
 ];
 
 const TestimonialCard: React.FC<{ testimonial: Testimonial, onClickReadMore: (t: Testimonial) => void }> = ({ testimonial, onClickReadMore }) => {
-  const isLong = testimonial.text.length > 150;
+  const words = testimonial.text.trim().split(/\s+/);
+  const isLong = words.length > 20;
   
   return (
-    <div className="bg-white p-8 rounded-3xl shadow-sm border border-slate-100 relative min-w-[350px] max-w-[350px] h-[320px] flex flex-col shrink-0 mx-4">
-      <div className="text-indigo-200 absolute top-6 right-8">
-        <svg width="30" height="24" viewBox="0 0 45 36" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-          <path d="M13.5 0C6.04416 0 0 6.04416 0 13.5V36H18V13.5H9C9 8.52943 13.0294 4.5 18 4.5V0H13.5ZM40.5 0C33.0442 0 27 6.04416 27 13.5V36H45V13.5H36C36 8.52943 40.0294 4.5 45 4.5V0H40.5Z" />
-        </svg>
+    <div className="bg-white p-8 rounded-xl shadow-lg relative min-w-[320px] max-w-[320px] h-[380px] flex flex-col items-center text-center shrink-0 mx-4 border border-slate-100">
+      <div className="w-20 h-20 bg-slate-200 rounded-full mb-4 flex items-center justify-center font-bold text-slate-500 overflow-hidden shrink-0 border-4 border-white shadow-sm">
+        <img src={`https://api.dicebear.com/7.x/initials/svg?seed=${testimonial.name}`} alt={testimonial.name} className="w-full h-full object-cover" />
       </div>
-      <div className="flex-1 overflow-hidden relative flex flex-col items-start justify-start">
-        <p className={`text-lg text-slate-600 italic relative z-10 leading-relaxed ${isLong ? 'line-clamp-4' : ''}`}>
-          "{testimonial.text}"
+      
+      <h4 className="font-bold text-slate-900 text-lg mb-1">{testimonial.name}</h4>
+      <p className="text-sm text-slate-500 mb-4">{testimonial.role}</p>
+      
+      <div className="flex items-center text-amber-400 mb-6 gap-1">
+        {[1, 2, 3, 4, 5].map((star) => (
+          <Star key={star} className="w-4 h-4 fill-current" />
+        ))}
+      </div>
+      
+      <div className="flex-1 overflow-hidden relative flex flex-col items-center">
+        <p className={`text-sm text-slate-600 leading-relaxed text-wrap ${isLong ? 'line-clamp-5' : ''}`}>
+          {testimonial.text}
         </p>
         {isLong && (
           <button 
@@ -38,15 +49,6 @@ const TestimonialCard: React.FC<{ testimonial: Testimonial, onClickReadMore: (t:
           </button>
         )}
       </div>
-      <div className="flex items-center mt-6 pt-4 border-t border-slate-100">
-        <div className="w-10 h-10 bg-slate-200 rounded-full mr-4 flex items-center justify-center font-bold text-slate-500 overflow-hidden shrink-0">
-          <img src={`https://api.dicebear.com/7.x/initials/svg?seed=${testimonial.name}`} alt={testimonial.name} />
-        </div>
-        <div>
-          <h4 className="font-bold text-slate-900 text-sm line-clamp-1">{testimonial.name}</h4>
-          <p className="text-xs text-slate-500 line-clamp-1">{testimonial.role}</p>
-        </div>
-      </div>
     </div>
   );
 }
@@ -54,7 +56,6 @@ const TestimonialCard: React.FC<{ testimonial: Testimonial, onClickReadMore: (t:
 export default function TestimonialSection() {
   const [testimonials, setTestimonials] = useState<Testimonial[]>(initialTestimonials);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [isSeeAllModalOpen, setIsSeeAllModalOpen] = useState(false);
   const [readMoreTestimonial, setReadMoreTestimonial] = useState<Testimonial | null>(null);
 
   const [formData, setFormData] = useState({ name: '', role: '', text: '' });
@@ -79,37 +80,33 @@ export default function TestimonialSection() {
   const allTestimonialsSorted = [...testimonials].sort((a, b) => b.date - a.date);
 
   return (
-    <div className="max-w-7xl mx-auto w-full py-12 overflow-hidden">
-      <div className="text-center mb-10 px-4">
-        <span className="text-indigo-600 font-bold tracking-wider uppercase text-sm mb-2 block">Client Reviews</span>
-        <h2 className="text-4xl font-extrabold text-slate-900 mb-6">What People Say</h2>
+    <div className="w-full py-16 overflow-hidden bg-slate-50">
+      <div className="max-w-7xl mx-auto text-center mb-12 px-4 flex flex-col items-center">
+        <h2 className="text-3xl font-extrabold text-slate-900 mb-4">Testimonials</h2>
+        <p className="text-sm text-slate-600 max-w-2xl mx-auto mb-6">
+          Real feedback from our amazing clients and students. Hear what they have to say about their experiences.
+        </p>
+        <div className="w-16 h-1 bg-amber-500 mb-8 rounded-full"></div>
+        
         <div className="flex justify-center gap-4 flex-wrap">
           <button 
             onClick={() => setIsAddModalOpen(true)}
-            className="inline-flex items-center px-6 py-3 rounded-full bg-indigo-600 text-white font-semibold hover:bg-indigo-700 transition-colors shadow-md"
+            className="inline-flex items-center px-6 py-2 rounded-full bg-slate-900 text-white font-semibold hover:bg-slate-800 transition-colors shadow-sm text-sm"
           >
-            <Plus className="w-5 h-5 mr-2" /> Add Testimony
+            <Plus className="w-4 h-4 mr-2" /> Add Testimony
           </button>
-          <button 
-            onClick={() => setIsSeeAllModalOpen(true)}
-            className="inline-flex items-center px-6 py-3 rounded-full bg-white text-slate-700 border border-slate-200 font-semibold hover:bg-slate-50 transition-colors shadow-sm"
+          <Link 
+            to="/testimonials"
+            className="inline-flex items-center px-6 py-2 rounded-full bg-white text-slate-700 border border-slate-200 font-semibold hover:bg-slate-50 transition-colors shadow-sm text-sm"
           >
-            <List className="w-5 h-5 mr-2" /> See All
-          </button>
+            <List className="w-4 h-4 mr-2" /> See All
+          </Link>
         </div>
       </div>
 
       {/* Marquee Animation */}
-      <div className="relative flex overflow-x-hidden w-full py-8" style={{ maskImage: 'linear-gradient(to right, transparent, black 10%, black 90%, transparent)' }}>
-        <motion.div
-          className="flex whitespace-nowrap will-change-transform"
-          animate={{ x: ["0%", "-50%"] }}
-          transition={{
-            repeat: Infinity,
-            ease: "linear",
-            duration: testimonials.length * 10 > 20 ? testimonials.length * 10 : 20,
-          }}
-        >
+      <div className="relative flex overflow-x-hidden w-full py-8 group" style={{ maskImage: 'linear-gradient(to right, transparent, black 10%, black 90%, transparent)' }}>
+        <div className="flex animate-[marquee_30s_linear_infinite] group-hover:[animation-play-state:paused] will-change-transform w-max">
           {/* Duplicate the array for seamless looping */}
           {[...testimonials, ...testimonials, ...testimonials, ...testimonials, ...testimonials, ...testimonials, ...testimonials, ...testimonials].map((testimonial, idx) => (
             <TestimonialCard 
@@ -118,7 +115,7 @@ export default function TestimonialSection() {
               onClickReadMore={setReadMoreTestimonial}
             />
           ))}
-        </motion.div>
+        </div>
       </div>
 
       {/* Add Testimony Modal */}
@@ -148,7 +145,7 @@ export default function TestimonialSection() {
                   <label className="block text-sm font-medium text-slate-700 mb-1">Name</label>
                   <input 
                     type="text" required
-                    className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-600 focus:border-transparent outline-none transition-all"
+                    className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-slate-900 focus:border-transparent outline-none transition-all"
                     value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})}
                   />
                 </div>
@@ -156,7 +153,7 @@ export default function TestimonialSection() {
                   <label className="block text-sm font-medium text-slate-700 mb-1">Role / Company (Optional)</label>
                   <input 
                     type="text" 
-                    className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-600 focus:border-transparent outline-none transition-all"
+                    className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-slate-900 focus:border-transparent outline-none transition-all"
                     value={formData.role} onChange={e => setFormData({...formData, role: e.target.value})}
                   />
                 </div>
@@ -164,62 +161,17 @@ export default function TestimonialSection() {
                   <label className="block text-sm font-medium text-slate-700 mb-1">Testimony</label>
                   <textarea 
                     required rows={4}
-                    className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-600 focus:border-transparent outline-none transition-all resize-none"
+                    className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-slate-900 focus:border-transparent outline-none transition-all resize-none"
                     value={formData.text} onChange={e => setFormData({...formData, text: e.target.value})}
                   ></textarea>
                 </div>
                 <button 
                   type="submit"
-                  className="w-full py-4 rounded-xl bg-indigo-600 text-white font-bold hover:bg-indigo-700 transition-colors mt-2"
+                  className="w-full py-4 rounded-xl bg-slate-900 text-white font-bold hover:bg-slate-800 transition-colors mt-2"
                 >
                   Submit
                 </button>
               </form>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
-
-      {/* See All Testimonials Modal */}
-      <AnimatePresence>
-        {isSeeAllModalOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6">
-            <motion.div 
-              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-              className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm"
-              onClick={() => setIsSeeAllModalOpen(false)}
-            />
-            <motion.div 
-              initial={{ opacity: 0, scale: 0.95, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="bg-slate-50 rounded-3xl p-6 sm:p-8 max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col relative z-10 shadow-2xl"
-            >
-              <div className="flex justify-between items-center mb-6 shrink-0">
-                <h3 className="text-2xl font-bold text-slate-900">All Testimonials</h3>
-                <button 
-                  onClick={() => setIsSeeAllModalOpen(false)}
-                  className="text-slate-400 hover:text-slate-600 bg-white rounded-full p-2 shadow-sm"
-                >
-                  <X className="w-6 h-6" />
-                </button>
-              </div>
-              <div className="overflow-y-auto pr-2 grid grid-cols-1 md:grid-cols-2 gap-6">
-                {allTestimonialsSorted.map(testimonial => (
-                  <div key={testimonial.id} className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
-                    <p className="text-slate-600 italic mb-6">"{testimonial.text}"</p>
-                    <div className="flex items-center">
-                      <div className="w-10 h-10 bg-slate-200 rounded-full mr-4 flex items-center justify-center font-bold text-slate-500 overflow-hidden shrink-0">
-                        <img src={`https://api.dicebear.com/7.x/initials/svg?seed=${testimonial.name}`} alt={testimonial.name} />
-                      </div>
-                      <div>
-                        <h4 className="font-bold text-slate-900 text-sm">{testimonial.name}</h4>
-                        <p className="text-xs text-slate-500">{testimonial.role}</p>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
             </motion.div>
           </div>
         )}
@@ -238,7 +190,7 @@ export default function TestimonialSection() {
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="bg-white rounded-3xl p-8 max-w-lg w-full relative z-10 shadow-2xl"
+              className="bg-white rounded-3xl p-8 max-w-lg w-full relative z-10 shadow-2xl flex flex-col items-center text-center"
             >
               <button 
                 onClick={() => setReadMoreTestimonial(null)}
@@ -246,17 +198,21 @@ export default function TestimonialSection() {
               >
                 <X className="w-6 h-6" />
               </button>
-              <div className="mb-6 flex items-center">
-                <div className="w-14 h-14 bg-slate-200 rounded-full mr-4 flex items-center justify-center font-bold text-slate-500 overflow-hidden shrink-0">
-                  <img src={`https://api.dicebear.com/7.x/initials/svg?seed=${readMoreTestimonial.name}`} alt={readMoreTestimonial.name} />
-                </div>
-                <div>
-                  <h4 className="font-bold text-slate-900 text-lg">{readMoreTestimonial.name}</h4>
-                  <p className="text-sm text-slate-500">{readMoreTestimonial.role}</p>
-                </div>
+              
+              <div className="w-20 h-20 bg-slate-200 rounded-full mb-4 flex items-center justify-center font-bold text-slate-500 overflow-hidden shrink-0">
+                <img src={`https://api.dicebear.com/7.x/initials/svg?seed=${readMoreTestimonial.name}`} alt={readMoreTestimonial.name} className="w-full h-full object-cover" />
               </div>
-              <p className="text-lg text-slate-700 italic leading-relaxed">
-                "{readMoreTestimonial.text}"
+              <h4 className="font-bold text-slate-900 text-xl mb-1">{readMoreTestimonial.name}</h4>
+              <p className="text-sm text-slate-500 mb-4">{readMoreTestimonial.role}</p>
+              
+              <div className="flex items-center text-amber-400 mb-6 gap-1">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <Star key={star} className="w-5 h-5 fill-current" />
+                ))}
+              </div>
+              
+              <p className="text-base text-slate-700 leading-relaxed">
+                {readMoreTestimonial.text}
               </p>
             </motion.div>
           </div>

@@ -1,24 +1,9 @@
 import { motion, useMotionValue, useTransform, animate, useInView } from 'motion/react';
-import { ArrowRight, Terminal, Code, Database, Globe, Download, Mail } from 'lucide-react';
+import { ArrowRight, Terminal, Code, Database, Globe, Download, Mail, Quote } from 'lucide-react';
 import { Link } from 'react-router';
 import { useEffect, useRef, useState } from 'react';
 import TestimonialSection from '../components/TestimonialSection';
 import ScrollReveal from '../components/ScrollReveal';
-
-function AnimatedCounter({ from, to, duration = 2, suffix = '' }: { from: number, to: number, duration?: number, suffix?: string }) {
-  const ref = useRef(null);
-  const inView = useInView(ref, { once: true });
-  const count = useMotionValue(from);
-  const rounded = useTransform(count, (latest) => Math.round(latest) + suffix);
-
-  useEffect(() => {
-    if (inView) {
-      animate(count, to, { duration, ease: "easeOut" });
-    }
-  }, [inView, count, to, duration]);
-
-  return <motion.span ref={ref}>{rounded}</motion.span>;
-}
 
 function TypewriterText({ text, delay = 0 }: { text: string, delay?: number }) {
   const [displayText, setDisplayText] = useState('');
@@ -49,6 +34,21 @@ function TypewriterText({ text, delay = 0 }: { text: string, delay?: number }) {
 }
 
 export default function Home() {
+  const [showAllQuotes, setShowAllQuotes] = useState(false);
+  
+  const allQuotes = [
+    { quote: "Code is read more often than it is written. Write it for the reader.", author: "Nsame Rene" },
+    { quote: "Simplicity is the soul of efficiency.", author: "Austin Freeman" },
+    { quote: "Mathematics is the language with which God has written the universe.", author: "Galileo Galilei" },
+    { quote: "First, solve the problem. Then, write the code.", author: "John Johnson" },
+    { quote: "Any fool can write code that a computer can understand. Good programmers write code that humans can understand.", author: "Martin Fowler" },
+    { quote: "Experience is the name everyone gives to their mistakes.", author: "Oscar Wilde" },
+    { quote: "Knowledge is power.", author: "Francis Bacon" },
+    { quote: "The only way to do great work is to love what you do.", author: "Steve Jobs" },
+  ];
+
+  const displayedQuotes = showAllQuotes ? allQuotes : allQuotes.slice(0, 4);
+
   return (
     <div className="flex flex-col gap-32 py-12 px-4 sm:px-6 lg:px-8">
       {/* Hero Section */}
@@ -136,28 +136,28 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Stats Section */}
-      <ScrollReveal className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto w-full">
-        {[
-          { label: 'Years Experience', to: 5, suffix: '+' },
-          { label: 'Projects Completed', to: 50, suffix: '+' },
-          { label: 'Happy Clients', to: 20, suffix: '+' },
-          { label: 'Certifications', to: 15, suffix: '+' },
-        ].map((stat, i) => (
-          <motion.div 
-            key={stat.label}
-            className="text-center p-6 bg-white rounded-2xl shadow-sm border border-slate-100"
-            initial={{ opacity: 0, scale: 0.9 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
-            transition={{ delay: i * 0.1 }}
-          >
-            <div className="text-3xl font-bold text-slate-900 mb-2">
-              <AnimatedCounter from={0} to={stat.to} suffix={stat.suffix} />
+      {/* Quote Section */}
+      <ScrollReveal className="max-w-5xl mx-auto w-full py-12">
+        <div className="bg-slate-900 rounded-3xl p-10 md:p-16 text-center shadow-2xl relative overflow-hidden flex flex-col items-center justify-center">
+          <div className="absolute top-0 right-0 -mr-20 -mt-20 w-64 h-64 bg-indigo-600/30 rounded-full blur-3xl"></div>
+          <div className="absolute bottom-0 left-0 -ml-20 -mb-20 w-64 h-64 bg-purple-600/30 rounded-full blur-3xl"></div>
+          
+          <div className="relative z-10">
+            <Quote className="w-16 h-16 text-indigo-400/50 mx-auto mb-8" />
+            <p className="text-2xl md:text-3xl lg:text-4xl font-medium text-white mb-10 leading-snug tracking-tight max-w-4xl mx-auto">
+              "Building software is not just about writing code; it's about crafting elegant solutions to real-world problems that empower people."
+            </p>
+            <div className="flex flex-col items-center">
+              <div className="w-12 h-1 bg-indigo-500 rounded-full mb-4"></div>
+              <p className="text-xl font-bold tracking-widest uppercase text-slate-300">
+                Nsame Rene
+              </p>
+              <p className="text-sm font-medium text-slate-500 mt-2">
+                Software Engineer
+              </p>
             </div>
-            <div className="text-sm font-medium text-slate-500">{stat.label}</div>
-          </motion.div>
-        ))}
+          </div>
+        </div>
       </ScrollReveal>
 
       {/* Skills Preview */}
@@ -201,6 +201,46 @@ export default function Home() {
         <TestimonialSection />
       </ScrollReveal>
 
+      {/* Quotes Section */}
+      <ScrollReveal className="max-w-4xl mx-auto w-full py-16">
+        <div className="text-center mb-12">
+          <span className="text-indigo-600 font-bold tracking-wider uppercase text-sm mb-2 block">My Philosophy</span>
+          <h2 className="text-4xl font-extrabold text-slate-900">Quotes & Principles</h2>
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {displayedQuotes.map((q, i) => (
+            <motion.div
+              key={i}
+              className="bg-white p-8 rounded-3xl shadow-sm border border-slate-100 flex flex-col justify-center relative overflow-hidden"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: (i % 4) * 0.1 }}
+            >
+              <div className="absolute top-4 left-6 text-6xl text-slate-100 font-serif leading-none opacity-50">"</div>
+              <p className="text-lg text-slate-700 italic relative z-10 mb-4 font-serif leading-relaxed">
+                "{q.quote}"
+              </p>
+              <div className="mt-auto text-sm font-bold text-indigo-600 tracking-wide uppercase">
+                — {q.author}
+              </div>
+            </motion.div>
+          ))}
+        </div>
+        
+        {allQuotes.length > 4 && (
+          <div className="mt-12 text-center">
+            <button
+              onClick={() => setShowAllQuotes(!showAllQuotes)}
+              className="inline-flex items-center px-6 py-3 bg-white border border-slate-200 text-slate-700 font-semibold rounded-full hover:bg-slate-50 hover:text-indigo-600 transition-colors shadow-sm"
+            >
+              {showAllQuotes ? "Show Less" : "Read all quotes"} <ArrowRight className={`ml-2 w-4 h-4 transition-transform ${showAllQuotes ? '-rotate-90' : 'rotate-90'}`} />
+            </button>
+          </div>
+        )}
+      </ScrollReveal>
+
       {/* Blog Preview Section */}
       <ScrollReveal className="max-w-6xl mx-auto w-full py-12">
         <div className="flex justify-between items-end mb-12">
@@ -215,13 +255,13 @@ export default function Home() {
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {[
-            { title: "Building Scalable Architecture with Next.js", category: "Engineering", date: "Oct 12, 2023", readTime: "5 min read", img: "https://images.unsplash.com/photo-1555066931-4365d14bab8c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" },
-            { title: "The Mathematics of Clean Code", category: "Philosophy", date: "Sep 28, 2023", readTime: "8 min read", img: "https://images.unsplash.com/photo-1509228468518-180dd4864904?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" },
-            { title: "Why Prisma Changed How I Write Backends", category: "Database", date: "Sep 15, 2023", readTime: "6 min read", img: "https://images.unsplash.com/photo-1544383835-bda2bc66a55d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" },
+            { id: 1, title: "Building Scalable Architecture with Next.js", category: "Engineering", date: "Oct 12, 2023", readTime: "5 min read", img: "https://images.unsplash.com/photo-1555066931-4365d14bab8c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" },
+            { id: 2, title: "The Mathematics of Clean Code", category: "Philosophy", date: "Sep 28, 2023", readTime: "8 min read", img: "https://images.unsplash.com/photo-1509228468518-180dd4864904?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" },
+            { id: 3, title: "Why Prisma Changed How I Write Backends", category: "Database", date: "Sep 15, 2023", readTime: "6 min read", img: "https://images.unsplash.com/photo-1544383835-bda2bc66a55d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" },
           ].map((post, i) => (
             <motion.div
               key={post.title}
-              className="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden group cursor-pointer hover:shadow-lg transition-all"
+              className="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden group cursor-pointer hover:shadow-lg transition-all flex flex-col"
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
@@ -233,16 +273,16 @@ export default function Home() {
                   {post.category}
                 </div>
               </div>
-              <div className="p-8">
+              <div className="p-8 flex flex-col flex-grow">
                 <div className="flex items-center text-xs font-medium text-slate-400 mb-3 space-x-3">
                   <span>{post.date}</span>
                   <span className="w-1 h-1 rounded-full bg-slate-300"></span>
                   <span>{post.readTime}</span>
                 </div>
-                <h3 className="text-xl font-bold text-slate-900 mb-4 group-hover:text-indigo-600 transition-colors leading-tight">
+                <h3 className="text-xl font-bold text-slate-900 mb-4 group-hover:text-indigo-600 transition-colors leading-tight flex-grow">
                   {post.title}
                 </h3>
-                <Link to="#" className="inline-flex items-center text-sm font-bold text-slate-900 group-hover:text-indigo-600 transition-colors">
+                <Link to={`/blog/${post.id}`} className="inline-flex items-center text-sm font-bold text-slate-900 group-hover:text-indigo-600 transition-colors">
                   Read Article <ArrowRight className="ml-2 w-4 h-4" />
                 </Link>
               </div>

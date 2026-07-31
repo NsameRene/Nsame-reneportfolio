@@ -1,8 +1,9 @@
 import { motion } from 'motion/react';
 import { BookOpen, Clock, Star, PlayCircle, ArrowRight } from 'lucide-react';
+import { Link } from 'react-router';
 import ScrollReveal from '../components/ScrollReveal';
 
-const courses = [
+export const courses = [
   {
     id: 1,
     title: "Full-Stack Web Development Bootcamp",
@@ -68,52 +69,53 @@ export default function Courses() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
         {courses.map((course, i) => (
-          <motion.div
-            key={course.id}
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: i * 0.1 }}
-            className="bg-white rounded-3xl overflow-hidden shadow-sm border border-slate-100 group hover:shadow-xl hover:border-indigo-100 transition-all flex flex-col"
-          >
-            <div className="relative aspect-video overflow-hidden">
-              <img src={course.image} alt={course.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
-              <div className="absolute inset-0 bg-slate-900/20 group-hover:bg-transparent transition-colors duration-500"></div>
-              {course.featured && (
-                <div className="absolute top-4 left-4 bg-indigo-600 text-white text-xs font-bold px-4 py-1.5 rounded-full shadow-lg">
-                  BESTSELLER
+          <Link to={`/courses/${course.id}`} key={course.id}>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: i * 0.1 }}
+              className="bg-white rounded-3xl overflow-hidden shadow-sm border border-slate-100 group hover:shadow-xl hover:border-indigo-100 transition-all flex flex-col h-full"
+            >
+              <div className="relative aspect-video overflow-hidden">
+                <img src={course.image} alt={course.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+                <div className="absolute inset-0 bg-slate-900/20 group-hover:bg-transparent transition-colors duration-500"></div>
+                {course.featured && (
+                  <div className="absolute top-4 left-4 bg-indigo-600 text-white text-xs font-bold px-4 py-1.5 rounded-full shadow-lg">
+                    BESTSELLER
+                  </div>
+                )}
+                <div className="absolute bottom-4 right-4 bg-white/95 backdrop-blur px-4 py-2 rounded-xl font-bold text-slate-900 shadow-lg">
+                  {course.price}
                 </div>
-              )}
-              <div className="absolute bottom-4 right-4 bg-white/95 backdrop-blur px-4 py-2 rounded-xl font-bold text-slate-900 shadow-lg">
-                {course.price}
-              </div>
-            </div>
-            
-            <div className="p-8 flex flex-col flex-grow">
-              <div className="flex items-center space-x-4 mb-4 text-sm font-medium text-slate-500">
-                <span className="flex items-center text-amber-500">
-                  <Star className="w-4 h-4 mr-1 fill-current" /> {course.rating}
-                </span>
-                <span className="w-1 h-1 rounded-full bg-slate-300"></span>
-                <span>{course.students} Students</span>
-                <span className="w-1 h-1 rounded-full bg-slate-300"></span>
-                <span className="text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-md">{course.level}</span>
               </div>
               
-              <h3 className="text-2xl font-bold text-slate-900 mb-3 group-hover:text-indigo-600 transition-colors">{course.title}</h3>
-              <p className="text-slate-600 mb-8 flex-grow leading-relaxed">{course.description}</p>
-              
-              <div className="flex items-center justify-between pt-6 border-t border-slate-100">
-                <div className="flex items-center space-x-6 text-sm font-semibold text-slate-700">
-                  <span className="flex items-center"><Clock className="w-4 h-4 mr-2 text-indigo-500" /> {course.duration}</span>
-                  <span className="flex items-center"><PlayCircle className="w-4 h-4 mr-2 text-indigo-500" /> {course.lessons} Lessons</span>
+              <div className="p-8 flex flex-col flex-grow">
+                <div className="flex items-center space-x-4 mb-4 text-sm font-medium text-slate-500">
+                  <span className="flex items-center text-amber-500">
+                    <Star className="w-4 h-4 mr-1 fill-current" /> {course.rating}
+                  </span>
+                  <span className="w-1 h-1 rounded-full bg-slate-300"></span>
+                  <span>{course.students} Students</span>
+                  <span className="w-1 h-1 rounded-full bg-slate-300"></span>
+                  <span className="text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-md">{course.level}</span>
                 </div>
-                <button className="flex items-center justify-center w-10 h-10 rounded-full bg-slate-50 text-slate-600 group-hover:bg-indigo-600 group-hover:text-white transition-colors">
-                  <ArrowRight className="w-5 h-5" />
-                </button>
+                
+                <h3 className="text-2xl font-bold text-slate-900 mb-3 group-hover:text-indigo-600 transition-colors">{course.title}</h3>
+                <p className="text-slate-600 mb-8 flex-grow leading-relaxed">{course.description}</p>
+                
+                <div className="flex items-center justify-between pt-6 border-t border-slate-100">
+                  <div className="flex items-center space-x-6 text-sm font-semibold text-slate-700">
+                    <span className="flex items-center"><Clock className="w-4 h-4 mr-2 text-indigo-500" /> {course.duration}</span>
+                    <span className="flex items-center"><PlayCircle className="w-4 h-4 mr-2 text-indigo-500" /> {course.lessons} Lessons</span>
+                  </div>
+                  <div className="flex items-center justify-center w-10 h-10 rounded-full bg-slate-50 text-slate-600 group-hover:bg-indigo-600 group-hover:text-white transition-colors">
+                    <ArrowRight className="w-5 h-5" />
+                  </div>
+                </div>
               </div>
-            </div>
-          </motion.div>
+            </motion.div>
+          </Link>
         ))}
       </div>
     </div>
