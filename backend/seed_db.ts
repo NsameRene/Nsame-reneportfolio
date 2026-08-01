@@ -1,5 +1,5 @@
-import { db } from './src/db/index';
-import * as schema from './src/db/schema';
+import { db } from './src/db/index.js';
+import * as schema from './src/db/schema.js';
 import { sql } from 'drizzle-orm';
 
 async function main() {
@@ -42,6 +42,22 @@ async function main() {
       { name: "Node.js", category: "Backend", proficiency: 85 },
       { name: "PostgreSQL", category: "Database", proficiency: 80 }
     ]);
+  }
+
+  console.log("Checking settings...");
+  const settingsCount = await db.select({ count: sql<number>`count(*)` }).from(schema.settings);
+  if (Number(settingsCount[0].count) === 0) {
+    console.log("Inserting default settings...");
+    await db.insert(schema.settings).values({
+      id: 1,
+      name: "",
+      email: "",
+      bio: "",
+      profileImageUrl: "",
+      phone: "",
+      location: "",
+      website: "",
+    });
   }
 
   console.log("Checking certificates...");

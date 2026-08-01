@@ -10,12 +10,25 @@ const upload = multer({ dest: 'uploads/' });
 export function setupRoutes(app: Express) {
   app.get('/api/settings', async (req, res) => {
     try {
-      const allSettings = await db.select().from(schema.settings);
-      const settingsObj = allSettings.reduce((acc, row) => {
-        acc[row.key] = row.value;
-        return acc;
-      }, {});
-      res.json(settingsObj);
+      const settingsRows = await db.select().from(schema.settings);
+
+      if (settingsRows.length === 0) {
+        const defaultSettings = {
+          id: 1,
+          name: '',
+          email: '',
+          bio: '',
+          profileImageUrl: '',
+          phone: '',
+          location: '',
+          website: '',
+        };
+
+        await db.insert(schema.settings).values(defaultSettings);
+        return res.json(defaultSettings);
+      }
+
+      res.json(settingsRows[0]);
     } catch (e) {
       console.error(e);
       res.status(500).json({ error: 'Failed to fetch settings' });
@@ -24,16 +37,18 @@ export function setupRoutes(app: Express) {
 
   app.put('/api/settings', requireAuth, async (req, res) => {
     try {
-      const updates = Object.entries(req.body);
-      for (const [key, value] of updates) {
-        // Upsert setting
-        const existing = await db.select().from(schema.settings).where(eq(schema.settings.key, key));
-        if (existing.length > 0) {
-          await db.update(schema.settings).set({ value: String(value) }).where(eq(schema.settings.key, key));
-        } else {
-          await db.insert(schema.settings).values({ key, value: String(value) });
-        }
+      const updateData = Object.fromEntries(
+        Object.entries(req.body).filter(([, value]) => value !== undefined)
+      );
+
+      const existing = await db.select().from(schema.settings).limit(1);
+
+      if (existing.length === 0) {
+        await db.insert(schema.settings).values({ id: 1, ...updateData });
+      } else {
+        await db.update(schema.settings).set(updateData).where(eq(schema.settings.id, 1));
       }
+
       res.json({ success: true });
     } catch (e) {
       console.error(e);
@@ -294,14 +309,14 @@ export function setupRoutes(app: Express) {
   });
 
   // Protected POST/PUT/DELETE routes
-  const createCrud = (name, schemaObj) => {
+  const createCrud = (name: string, schemaObj: any) => {
     app.post(`/api/${name}`, requireAuth, upload.single('image'), async (req, res) => {
       try {
         const data = { ...req.body };
         if (req.file) {
           data.imageUrl = `/uploads/${req.file.filename}`;
         }
-        const result = await db.insert(schemaObj).values(data).returning();
+        const result: any = await db.insert(schemaObj).values(data).returning();
         res.json(result[0]);
       } catch (e) { res.status(500).json({ error: 'Failed' }); }
     });
@@ -374,7 +389,7 @@ export function setupRoutes(app: Express) {
         user = { email: ADMIN_EMAIL, role: 'admin' };
       }
       
-      if (!isValid) {
+      if (!isValid || !user) {
         return res.status(401).json({ error: 'Invalid credentials' });
       }
       

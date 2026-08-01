@@ -1,8 +1,11 @@
+import dotenv from "dotenv";
 import express from "express";
 import fs from "fs";
 import path from "path";
 import cors from "cors";
 import { setupRoutes } from "./src/routes/index.js";
+
+dotenv.config();
 
 async function startServer() {
   const app = express();
