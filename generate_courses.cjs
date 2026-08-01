@@ -1,4 +1,6 @@
-import React, { useState, useEffect } from 'react';
+const fs = require('fs');
+
+const code = `import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { BookOpen, Clock, Star, PlayCircle, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router';
@@ -10,7 +12,7 @@ export default function Courses() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch(`${API_BASE}/api/courses`)
+    fetch(\`\${API_BASE}/api/courses\`)
       .then(res => res.json())
       .then(data => setCourses(data))
       .catch(err => console.error(err))
@@ -30,7 +32,7 @@ export default function Courses() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
           {courses.map((course: any, i: number) => (
-            <Link to={`/courses/${course.id}`} key={course.id}>
+            <Link to={\`/courses/\${course.id}\`} key={course.id}>
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -84,3 +86,6 @@ export default function Courses() {
     </div>
   );
 }
+`;
+
+fs.writeFileSync('src/pages/Courses.tsx', code);

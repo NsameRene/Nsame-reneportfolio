@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+const fs = require('fs');
+
+const adminCode = `import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { API_BASE } from '../utils/api';
-import { LogOut, LayoutDashboard, Cpu, Briefcase, FileText, FileBadge, MessageSquare, Settings, Plus, Edit2, Trash2, ShieldCheck, Mail, Lock, BookOpen, Quote, Image as ImageIcon, X } from 'lucide-react';
+import { LogOut, LayoutDashboard, Briefcase, FileText, FileBadge, MessageSquare, Settings, Plus, Edit2, Trash2, ShieldCheck, Mail, Lock, BookOpen, Quote, Image as ImageIcon, X } from 'lucide-react';
 
 export default function Admin() {
   const [user, setUser] = useState<any | null>(null);
@@ -32,11 +33,11 @@ export default function Admin() {
 
   const fetchItems = async () => {
     try {
-      const endpoints = ['projects', 'blogs', 'courses', 'quotes', 'gallery', 'education', 'experiences', 'skills', 'certificates', 'what_i_do'];
+      const endpoints = ['projects', 'blogs', 'courses', 'quotes', 'gallery', 'education', 'experiences', 'skills', 'certificates'];
       const results: Record<string, any[]> = {};
       
       for (const ep of endpoints) {
-        const res = await fetch(`${API_BASE}/api/${ep}`);
+        const res = await fetch(\`/api/\${ep}\`);
         if (res.ok) {
           results[ep] = await res.json();
         }
@@ -50,9 +51,9 @@ export default function Admin() {
   useEffect(() => {
     const token = localStorage.getItem('admin_token');
     if (token) {
-      fetch(`${API_BASE}/api/auth/check`, {
+      fetch('/api/auth/check', {
         method: 'POST',
-        headers: { 'Authorization': `Bearer ${token}` }
+        headers: { 'Authorization': \`Bearer \${token}\` }
       })
       .then(res => res.json())
       .then(d => {
@@ -76,7 +77,7 @@ export default function Admin() {
       setLoading(true);
       setAuthError('');
       
-      const res = await fetch(`${API_BASE}/api/auth/login`, {
+      const res = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password })
@@ -108,9 +109,9 @@ export default function Admin() {
     if (!confirm('Are you sure you want to delete this item?')) return;
     try {
       const token = localStorage.getItem('admin_token');
-      await fetch(`${API_BASE}/api/${type}/${id}`, {
+      await fetch(\`/api/\${type}/\${id}\`, {
         method: 'DELETE',
-        headers: { 'Authorization': `Bearer ${token}` }
+        headers: { 'Authorization': \`Bearer \${token}\` }
       });
       fetchItems();
     } catch (err) {
@@ -123,23 +124,23 @@ export default function Admin() {
     const token = localStorage.getItem('admin_token');
     const formData = new FormData(e.target as HTMLFormElement);
     
-    let type = activeTab.toLowerCase().replace(/ /g, '_');
+    let type = activeTab.toLowerCase();
     if (type === 'cv') {
       type = cvSubTab;
     }
 
-    let url = `/api/${type}`;
+    let url = \`/api/\${type}\`;
     let method = 'POST';
 
     if (editingItem) {
-      url += `/${editingItem.id}`;
+      url += \`/\${editingItem.id}\`;
       method = 'PUT';
     }
 
     try {
       await fetch(url, {
         method,
-        headers: { 'Authorization': `Bearer ${token}` },
+        headers: { 'Authorization': \`Bearer \${token}\` },
         body: formData
       });
       setIsModalOpen(false);
@@ -228,7 +229,6 @@ export default function Admin() {
     { name: 'Courses', icon: BookOpen },
     { name: 'Quotes', icon: Quote },
     { name: 'Gallery', icon: ImageIcon },
-    { name: 'What I Do', icon: Cpu },
     { name: 'Messages', icon: MessageSquare },
     { name: 'Settings', icon: Settings },
   ];
@@ -236,7 +236,7 @@ export default function Admin() {
   const hasAddButton = ['Projects', 'Blogs', 'CV', 'Courses', 'Quotes', 'Gallery'].includes(activeTab);
 
   const getListToRender = () => {
-    let type = activeTab.toLowerCase().replace(/ /g, '_');
+    let type = activeTab.toLowerCase();
     if (type === 'cv') {
       type = cvSubTab;
     }
@@ -269,9 +269,9 @@ export default function Admin() {
               <button 
                 key={item.name} 
                 onClick={() => setActiveTab(item.name)}
-                className={`flex items-center px-4 py-2.5 rounded-xl font-semibold transition-all text-sm ${isActive ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'}`}
+                className={\`flex items-center px-4 py-2.5 rounded-xl font-semibold transition-all text-sm \${isActive ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'}\`}
               >
-                <Icon className={`w-4 h-4 mr-3 ${isActive ? 'text-indigo-200' : 'text-slate-400'}`} />
+                <Icon className={\`w-4 h-4 mr-3 \${isActive ? 'text-indigo-200' : 'text-slate-400'}\`} />
                 {item.name}
               </button>
             )
@@ -315,7 +315,7 @@ export default function Admin() {
                   { title: 'Published Blogs', count: data.blogs?.length || 0, color: 'bg-emerald-50 text-emerald-700 border-emerald-100' },
                   { title: 'Unread Messages', count: '0', color: 'bg-rose-50 text-rose-700 border-rose-100' },
                 ].map((stat, i) => (
-                  <div key={i} className={`p-6 rounded-2xl border ${stat.color}`}>
+                  <div key={i} className={\`p-6 rounded-2xl border \${stat.color}\`}>
                     <div className="text-xs font-bold tracking-wider uppercase mb-2 opacity-80">{stat.title}</div>
                     <div className="text-4xl font-extrabold">{stat.count}</div>
                   </div>
@@ -323,7 +323,7 @@ export default function Admin() {
               </div>
             )}
             
-            {(activeTab === 'Projects' || activeTab === 'Blogs' || activeTab === 'Courses' || activeTab === 'Quotes' || activeTab === 'Gallery' || activeTab === 'What I Do') && (
+            {(activeTab === 'Projects' || activeTab === 'Blogs' || activeTab === 'Courses' || activeTab === 'Quotes' || activeTab === 'Gallery') && (
               <div className="space-y-4">
                 {currentList.map((item, i) => (
                   <div key={i} className="flex flex-col sm:flex-row items-center justify-between p-4 rounded-2xl border border-slate-200 hover:border-indigo-300 hover:shadow-md transition-all gap-4">
@@ -342,7 +342,7 @@ export default function Admin() {
                     </div>
                     <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
                       <button onClick={() => openModal(item)} className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"><Edit2 className="w-4 h-4" /></button>
-                      <button onClick={() => handleDelete(activeTab.toLowerCase().replace(/ /g, '_'), item.id)} className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"><Trash2 className="w-4 h-4" /></button>
+                      <button onClick={() => handleDelete(activeTab.toLowerCase(), item.id)} className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"><Trash2 className="w-4 h-4" /></button>
                     </div>
                   </div>
                 ))}
@@ -357,7 +357,7 @@ export default function Admin() {
                       <button 
                         key={sub}
                         onClick={() => setCvSubTab(sub)}
-                        className={`px-4 py-2 rounded-lg font-semibold text-sm transition-colors whitespace-nowrap ${cvSubTab === sub ? 'bg-indigo-100 text-indigo-700' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}
+                        className={\`px-4 py-2 rounded-lg font-semibold text-sm transition-colors whitespace-nowrap \${cvSubTab === sub ? 'bg-indigo-100 text-indigo-700' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}\`}
                       >
                         {sub.charAt(0).toUpperCase() + sub.slice(1)}
                       </button>
@@ -487,22 +487,6 @@ export default function Admin() {
                       </>
                     )}
 
-                    {activeTab === 'What I Do' && (
-                      <>
-                        <div>
-                          <label className="block text-sm font-semibold text-slate-700 mb-2">Title</label>
-                          <input name="title" type="text" required defaultValue={editingItem?.title || ''} className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 focus:ring-2 focus:ring-indigo-600 outline-none text-sm font-medium" />
-                        </div>
-                        <div>
-                          <label className="block text-sm font-semibold text-slate-700 mb-2">Icon (e.g. Globe, Terminal, Database, Cpu, Code)</label>
-                          <input name="icon" type="text" required defaultValue={editingItem?.icon || 'Terminal'} className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 focus:ring-2 focus:ring-indigo-600 outline-none text-sm font-medium" />
-                        </div>
-                        <div>
-                          <label className="block text-sm font-semibold text-slate-700 mb-2">Items (Comma separated, e.g. React, Next.js, Tailwind)</label>
-                          <textarea name="items" rows={3} required defaultValue={editingItem?.items || ''} className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 focus:ring-2 focus:ring-indigo-600 outline-none resize-none text-sm font-medium" placeholder="React, Node.js, TypeScript" />
-                        </div>
-                      </>
-                    )}
                     {activeTab === 'Quotes' && (
                       <>
                         <div>
@@ -619,3 +603,6 @@ export default function Admin() {
     </div>
   );
 }
+`;
+
+fs.writeFileSync('src/pages/Admin.tsx', adminCode);

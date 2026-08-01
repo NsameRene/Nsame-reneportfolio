@@ -1,4 +1,6 @@
-import React, { useState, useEffect } from 'react';
+const fs = require('fs');
+
+const code = `import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { Star, ArrowLeft } from 'lucide-react';
 import { Link } from 'react-router';
@@ -10,7 +12,7 @@ export default function Testimonials() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch(`${API_BASE}/api/quotes`)
+    fetch(\`\${API_BASE}/api/quotes\`)
       .then(res => res.json())
       .then(data => setTestimonials(data))
       .catch(err => console.error(err))
@@ -37,7 +39,7 @@ export default function Testimonials() {
               <ScrollReveal delay={i * 0.1}>
                 <div className="bg-white p-8 rounded-2xl shadow-sm border border-slate-100 flex flex-col items-center text-center h-full hover:shadow-lg transition-shadow">
                   <div className="w-20 h-20 bg-slate-200 rounded-full mb-4 flex items-center justify-center font-bold text-slate-500 overflow-hidden shrink-0 border-4 border-white shadow-sm">
-                    <img src={`https://api.dicebear.com/7.x/initials/svg?seed=${testimonial.author}`} alt={testimonial.author} className="w-full h-full object-cover" />
+                    <img src={\`https://api.dicebear.com/7.x/initials/svg?seed=\${testimonial.author}\`} alt={testimonial.author} className="w-full h-full object-cover" />
                   </div>
                   <h4 className="font-bold text-slate-900 text-lg mb-1">{testimonial.author}</h4>
                   <p className="text-sm text-slate-500 mb-4">{testimonial.role || 'Client'}</p>
@@ -57,3 +59,6 @@ export default function Testimonials() {
     </div>
   );
 }
+`;
+
+fs.writeFileSync('src/pages/Testimonials.tsx', code);

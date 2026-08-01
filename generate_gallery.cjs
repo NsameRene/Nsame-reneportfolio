@@ -1,4 +1,6 @@
-import React, { useState, useEffect } from 'react';
+const fs = require('fs');
+
+const code = `import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Play, Image as ImageIcon, X } from 'lucide-react';
 import ScrollReveal from '../components/ScrollReveal';
@@ -11,7 +13,7 @@ export default function Gallery() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch(`${API_BASE}/api/gallery`)
+    fetch(\`\${API_BASE}/api/gallery\`)
       .then(res => res.json())
       .then(data => setGalleryItems(data))
       .catch(err => console.error(err))
@@ -41,11 +43,11 @@ export default function Gallery() {
                   <button
                     key={type}
                     onClick={() => setFilter(type)}
-                    className={`px-6 py-3 rounded-2xl font-semibold transition-all whitespace-nowrap text-center lg:text-left ${
+                    className={\`px-6 py-3 rounded-2xl font-semibold transition-all whitespace-nowrap text-center lg:text-left \${
                       filter === type 
                          ? 'bg-indigo-600 text-white shadow-md' 
                          : 'bg-slate-50 text-slate-600 hover:bg-slate-100'
-                    }`}
+                    }\`}
                   >
                     {type}
                   </button>
@@ -123,3 +125,6 @@ export default function Gallery() {
     </div>
   );
 }
+`;
+
+fs.writeFileSync('src/pages/Gallery.tsx', code);

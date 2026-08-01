@@ -8,6 +8,39 @@ import { eq } from 'drizzle-orm';
 const upload = multer({ dest: 'uploads/' });
 
 export function setupRoutes(app: Express) {
+  app.get('/api/settings', async (req, res) => {
+    try {
+      const allSettings = await db.select().from(schema.settings);
+      const settingsObj = allSettings.reduce((acc, row) => {
+        acc[row.key] = row.value;
+        return acc;
+      }, {});
+      res.json(settingsObj);
+    } catch (e) {
+      console.error(e);
+      res.status(500).json({ error: 'Failed to fetch settings' });
+    }
+  });
+
+  app.put('/api/settings', requireAuth, async (req, res) => {
+    try {
+      const updates = Object.entries(req.body);
+      for (const [key, value] of updates) {
+        // Upsert setting
+        const existing = await db.select().from(schema.settings).where(eq(schema.settings.key, key));
+        if (existing.length > 0) {
+          await db.update(schema.settings).set({ value: String(value) }).where(eq(schema.settings.key, key));
+        } else {
+          await db.insert(schema.settings).values({ key, value: String(value) });
+        }
+      }
+      res.json({ success: true });
+    } catch (e) {
+      console.error(e);
+      res.status(500).json({ error: 'Failed to update settings' });
+    }
+  });
+
   // Public Routes
   app.get('/api/projects', async (req, res) => {
     try {
@@ -233,14 +266,90 @@ export function setupRoutes(app: Express) {
     }
   });
 
+
+  // Public GET routes for new entities
+  app.get('/api/courses', async (req, res) => {
+    try {
+      const all = await db.select().from(schema.courses);
+      res.json(all);
+    } catch (e) { res.status(500).json({ error: 'Failed' }); }
+  });
+  app.get('/api/quotes', async (req, res) => {
+    try {
+      const all = await db.select().from(schema.quotes);
+      res.json(all);
+    } catch (e) { res.status(500).json({ error: 'Failed' }); }
+  });
+  app.get('/api/gallery', async (req, res) => {
+    try {
+      const all = await db.select().from(schema.gallery);
+      res.json(all);
+    } catch (e) { res.status(500).json({ error: 'Failed' }); }
+  });
+  app.get('/api/education', async (req, res) => {
+    try {
+      const all = await db.select().from(schema.education);
+      res.json(all);
+    } catch (e) { res.status(500).json({ error: 'Failed' }); }
+  });
+
+  // Protected POST/PUT/DELETE routes
+  const createCrud = (name, schemaObj) => {
+    app.post(`/api/${name}`, requireAuth, upload.single('image'), async (req, res) => {
+      try {
+        const data = { ...req.body };
+        if (req.file) {
+          data.imageUrl = `/uploads/${req.file.filename}`;
+        }
+        const result = await db.insert(schemaObj).values(data).returning();
+        res.json(result[0]);
+      } catch (e) { res.status(500).json({ error: 'Failed' }); }
+    });
+    app.put(`/api/${name}/:id`, requireAuth, upload.single('image'), async (req, res) => {
+      try {
+        const data = { ...req.body };
+        if (req.file) {
+          data.imageUrl = `/uploads/${req.file.filename}`;
+        }
+        const result = await db.update(schemaObj).set(data).where(eq(schemaObj.id, parseInt(req.params.id))).returning();
+        res.json(result[0]);
+      } catch (e) { res.status(500).json({ error: 'Failed' }); }
+    });
+    app.delete(`/api/${name}/:id`, requireAuth, async (req, res) => {
+      try {
+        await db.delete(schemaObj).where(eq(schemaObj.id, parseInt(req.params.id)));
+        res.json({ success: true });
+      } catch (e) { res.status(500).json({ error: 'Failed' }); }
+    });
+  };
+
+  createCrud('courses', schema.courses);
+  createCrud('quotes', schema.quotes);
+  createCrud('gallery', schema.gallery);
+  createCrud('education', schema.education);
+  createCrud('experiences', schema.experiences);
+  createCrud('skills', schema.skills);
+  createCrud('certificates', schema.certificates);
+
   // Similarly add other CRUD routes...
+
   // User login
+  
+  app.get('/api/what_i_do', async (req, res) => {
+    try {
+      const all = await db.select().from(schema.what_i_do);
+      res.json(all);
+    } catch (e) { res.status(500).json({ error: 'Failed' }); }
+  });
+
+  createCrud('what_i_do', schema.what_i_do);
+
   app.post('/api/auth/login', async (req, res) => {
     try {
       const { email, password } = req.body;
       
       // We will allow a hardcoded admin login if DB is empty or as a fallback
-      const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'admin@elignite.com';
+      const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'nsamerenetamjong@gmail.com';
       const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'admin123';
       
       let user = null;

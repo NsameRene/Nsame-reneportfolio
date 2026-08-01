@@ -1,4 +1,6 @@
-import React, { useState, useEffect } from 'react';
+const fs = require('fs');
+
+const code = `import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router';
 import { motion, AnimatePresence } from 'motion/react';
 import { ArrowLeft, Clock, PlayCircle, Star, Users, CheckCircle, Award, MessageCircle } from 'lucide-react';
@@ -14,7 +16,7 @@ export default function CourseDetails() {
   const [certForm, setCertForm] = useState({ name: '', email: '', reason: '' });
 
   useEffect(() => {
-    fetch(`${API_BASE}/api/courses`)
+    fetch(\`\${API_BASE}/api/courses\`)
       .then(res => res.json())
       .then(data => {
         const found = data.find((c: any) => c.id === parseInt(id || '0'));
@@ -214,7 +216,7 @@ export default function CourseDetails() {
                   
                   <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                     <a 
-                      href={`https://wa.me/1234567890?text=Hi Nsame! I am submitting my exercises for the ${course.title} course.`}
+                      href={\`https://wa.me/1234567890?text=Hi Nsame! I am submitting my exercises for the \${course.title} course.\`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="px-8 py-4 bg-emerald-600 text-white font-bold rounded-full hover:bg-emerald-500 transition-colors shadow-lg flex items-center w-full sm:w-auto text-lg justify-center"
@@ -265,3 +267,6 @@ export default function CourseDetails() {
     </div>
   );
 }
+`;
+
+fs.writeFileSync('src/pages/CourseDetails.tsx', code);

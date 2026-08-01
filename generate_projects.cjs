@@ -1,4 +1,6 @@
-import React, { useState, useEffect } from 'react';
+const fs = require('fs');
+
+const code = `import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { Github, ExternalLink } from 'lucide-react';
 import ScrollReveal from '../components/ScrollReveal';
@@ -9,7 +11,7 @@ export default function Projects() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch(`${API_BASE}/api/projects`)
+    fetch(\`\${API_BASE}/api/projects\`)
       .then(res => res.json())
       .then(data => setProjects(data))
       .catch(err => console.error(err))
@@ -34,7 +36,7 @@ export default function Projects() {
             return (
             <div key={project.id || index}>
               <ScrollReveal delay={index * 0.1}>
-                <div className={`flex flex-col ${index % 2 === 1 ? 'lg:flex-row-reverse' : 'lg:flex-row'} gap-12 items-center`}>
+                <div className={\`flex flex-col \${index % 2 === 1 ? 'lg:flex-row-reverse' : 'lg:flex-row'} gap-12 items-center\`}>
                 <div className="w-full lg:w-1/2">
                   <div className="relative rounded-3xl overflow-hidden shadow-2xl aspect-[4/3] group">
                     <div className="absolute inset-0 bg-slate-900/10 group-hover:bg-transparent transition-colors z-10" />
@@ -81,3 +83,6 @@ export default function Projects() {
     </div>
   );
 }
+`;
+
+fs.writeFileSync('src/pages/Projects.tsx', code);

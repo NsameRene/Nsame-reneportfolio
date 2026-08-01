@@ -97,3 +97,22 @@ export const contact_messages = pgTable('contact_messages', {
   message: text('message').notNull(),
   createdAt: timestamp('created_at').defaultNow(),
 });
+
+export const settings = pgTable('settings', {
+  id: integer('id').primaryKey(), // We'll just use a single row with id 1
+  name: text('name'),
+  email: text('email'),
+  bio: text('bio'),
+  profileImageUrl: text('profileImageUrl'),
+  phone: text('phone'),
+  location: text('location'),
+  website: text('website')
+});
+
+
+export const what_i_do = pgTable('what_i_do', {
+  id: serial('id').primaryKey(),
+  title: text('title').notNull(),
+  icon: text('icon').notNull(), // 'Globe', 'Terminal', 'Database', etc.
+  items: text('items').notNull(), // JSON string array
+});

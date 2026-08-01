@@ -1,4 +1,6 @@
-import React, { useState, useEffect } from 'react';
+const fs = require('fs');
+
+const cvCode = `import React, { useState, useEffect } from 'react';
 import { Mail, MapPin, Globe, Phone, ExternalLink, Briefcase, GraduationCap, Award, CheckCircle2 } from 'lucide-react';
 import { API_BASE } from '../utils/api';
 
@@ -7,8 +9,7 @@ export default function CV() {
     experiences: [],
     education: [],
     skills: [],
-    certificates: [],
-    settings: { name: '', bio: '', email: '', phone: '', location: '', website: '', profileImageUrl: '' }
+    certificates: []
   });
 
   const [loading, setLoading] = useState(true);
@@ -16,19 +17,17 @@ export default function CV() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [exp, edu, ski, cert, settingsData] = await Promise.all([
-          fetch(`${API_BASE}/api/experiences`).then(res => res.json()),
-          fetch(`${API_BASE}/api/education`).then(res => res.json()),
-          fetch(`${API_BASE}/api/skills`).then(res => res.json()),
-          fetch(`${API_BASE}/api/certificates`).then(res => res.json()),
-          fetch(`${API_BASE}/api/settings`).then(res => res.json())
+        const [exp, edu, ski, cert] = await Promise.all([
+          fetch(\`\${API_BASE}/api/experiences\`).then(res => res.json()),
+          fetch(\`\${API_BASE}/api/education\`).then(res => res.json()),
+          fetch(\`\${API_BASE}/api/skills\`).then(res => res.json()),
+          fetch(\`\${API_BASE}/api/certificates\`).then(res => res.json())
         ]);
         setData({
           experiences: exp,
           education: edu,
           skills: ski,
-          certificates: cert,
-          settings: settingsData
+          certificates: cert
         });
       } catch (err) {
         console.error("Failed to fetch CV data", err);
@@ -45,14 +44,14 @@ export default function CV() {
 
   // Hardcoded personal info (would come from settings in a real app)
   const personalInfo = {
-    name: data.settings?.name || "Nsame Reneta Mjong",
-    role: "Full Stack Developer",
-    email: data.settings?.email || "nsamerenetamjong@gmail.com",
-    phone: data.settings?.phone || "+1234567890",
-    location: data.settings?.location || "Douala, CMR",
-    website: data.settings?.website || "www.example.com",
-    image: data.settings?.profileImageUrl || "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-    bio: data.settings?.bio || "A passionate educator and software engineer..."
+    name: "Nsame Rene",
+    role: "Software Engineer",
+    email: "nsamerenetamjong@gmail.com",
+    phone: "+1 234 567 890",
+    location: "London, UK",
+    website: "https://elignite.com",
+    bio: "Experienced Software Engineer with a demonstrated history of working in the information technology and services industry. Skilled in modern web development, scalable architecture, and building user-centric applications.",
+    image: "https://api.dicebear.com/7.x/notionists/svg?seed=NsameReneTamjong&backgroundColor=e2e8f0"
   };
 
   return (
@@ -192,3 +191,6 @@ export default function CV() {
     </div>
   );
 }
+`;
+
+fs.writeFileSync('src/pages/CV.tsx', cvCode);

@@ -1,6 +1,7 @@
 import { motion, useMotionValue, useTransform, animate, useInView } from 'motion/react';
 import { ArrowRight, Terminal, Code, Database, Globe, Download, Mail, Quote } from 'lucide-react';
 import { Link } from 'react-router';
+import { API_BASE } from '../utils/api';
 import { useEffect, useRef, useState } from 'react';
 import TestimonialSection from '../components/TestimonialSection';
 import ScrollReveal from '../components/ScrollReveal';
@@ -34,6 +35,20 @@ function TypewriterText({ text, delay = 0 }: { text: string, delay?: number }) {
 }
 
 export default function Home() {
+  const [settings, setSettings] = useState<any>({});
+  const [whatIDo, setWhatIDo] = useState<any[]>([]);
+  useEffect(() => {
+    fetch(`${API_BASE}/api/what_i_do`).then(res => res.json()).then(data => setWhatIDo(data)).catch(console.error);
+  }, []);
+
+  
+  useEffect(() => {
+    fetch(`${API_BASE}/api/settings`)
+      .then(res => res.json())
+      .then(data => setSettings(data))
+      .catch(err => console.error(err));
+  }, []);
+
   const [showAllQuotes, setShowAllQuotes] = useState(false);
   
   const allQuotes = [
@@ -50,94 +65,80 @@ export default function Home() {
   const displayedQuotes = showAllQuotes ? allQuotes : allQuotes.slice(0, 4);
 
   return (
-    <div className="flex flex-col gap-32 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="flex flex-col gap-32 pb-12">
+      
       {/* Hero Section */}
-      <section className="pt-24 pb-16 min-h-[85vh] flex items-center">
-        <div className="max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-          {/* Left Content */}
-          <div className="order-2 lg:order-1 text-center lg:text-left">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-              className="inline-flex items-center space-x-2 bg-white px-5 py-2.5 rounded-full mb-8 text-sm font-bold text-slate-800 shadow-sm border border-slate-100"
-            >
-              <span className="relative flex h-3 w-3">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
-              </span>
-              <span>Available for new opportunities</span>
-            </motion.div>
-
-            <motion.h1 
-              className="text-5xl sm:text-6xl md:text-7xl font-black tracking-tighter text-slate-900 mb-8 leading-[1.05]"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
-            >
-              Hi, I'm <br className="hidden md:block" />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-600 bg-300% animate-gradient">Nsame Rene Tamjong</span>
-            </motion.h1>
-            
+      <section className="relative w-full overflow-hidden bg-slate-900 min-h-[90vh] flex items-center pt-24 pb-12 rounded-b-3xl">
+        <div className="absolute inset-0 z-0">
+          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-indigo-500/20 rounded-full blur-[128px]"></div>
+          <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-500/20 rounded-full blur-[128px]"></div>
+          <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-overlay"></div>
+        </div>
+        
+        <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center relative z-10">
+          <div className="text-center lg:text-left mb-12 lg:mb-0">
             <motion.div 
-              className="text-xl md:text-2xl text-slate-500 max-w-2xl mx-auto lg:mx-0 mb-12 leading-relaxed font-medium min-h-[6rem] sm:min-h-[4rem]"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
+              className="inline-flex items-center px-4 py-2 rounded-full bg-white/5 border border-white/10 mb-8 backdrop-blur-md"
             >
-              <TypewriterText text="Full Stack Software Engineer & Mathematics Educator. Founder & CEO of ELIGNITE. Creator of EduIgnite." delay={0.8} />
+              <span className="w-2 h-2 rounded-full bg-indigo-400 mr-2 animate-pulse"></span>
+              <span className="text-indigo-200 text-sm font-medium tracking-wide">Available for new opportunities</span>
             </motion.div>
             
+            <h1 className="text-5xl sm:text-6xl md:text-7xl font-extrabold text-white leading-tight mb-6 tracking-tight">
+              <span className="block text-slate-400 text-3xl sm:text-4xl md:text-5xl mb-2 font-medium">Hello, I'm</span>
+              {settings.name || "Nsame Reneta Mjong"}
+            </h1>
+            
+            <div className="text-2xl sm:text-3xl font-medium text-indigo-300 mb-8 h-10">
+              <TypewriterText text="Full Stack Developer & Software Engineer" delay={0.5} />
+            </div>
+            
+            <motion.p 
+              className="text-slate-400 mb-10 max-w-xl mx-auto lg:mx-0 text-lg leading-relaxed"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 1, duration: 1 }}
+            >
+              {settings.bio || "I build elegant, scalable, and user-centric applications. Let's create something amazing together."}
+            </motion.p>
+            
             <motion.div 
-              className="flex flex-col sm:flex-row justify-center lg:justify-start gap-6 w-full sm:w-auto"
+              className="flex flex-wrap items-center justify-center lg:justify-start gap-4"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
+              transition={{ delay: 1.2 }}
             >
-              <Link to="/projects" className="inline-flex justify-center items-center px-10 py-5 rounded-full bg-slate-900 text-white font-bold text-lg hover:bg-indigo-600 transition-all hover:shadow-xl hover:shadow-indigo-500/20 hover:-translate-y-1 active:translate-y-0 w-full sm:w-auto">
-                View My Work <ArrowRight className="ml-3 w-6 h-6" />
+              <Link to="/contact" className="px-8 py-4 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-500 transition-all shadow-lg shadow-indigo-500/25 flex items-center group">
+                Let's Talk
+                <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
               </Link>
-              <Link to="/cv" className="inline-flex justify-center items-center px-10 py-5 rounded-full bg-white text-slate-900 font-bold text-lg shadow-sm border border-slate-200 hover:border-slate-300 hover:bg-slate-50 transition-all hover:-translate-y-1 w-full sm:w-auto">
-                <Download className="mr-3 w-6 h-6" /> Download CV
+              <Link to="/about" className="px-8 py-4 bg-white/5 border border-white/10 text-white font-bold rounded-xl hover:bg-white/10 transition-all backdrop-blur-sm">
+                About Me
               </Link>
             </motion.div>
           </div>
-
-          {/* Right Image */}
-          <motion.div
-            className="order-1 lg:order-2 relative flex justify-center items-center"
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
-          >
-            <img
-              src="https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=1200&q=80"
-              alt="Nsame Rene"
-              className="relative z-10 w-full max-w-md aspect-[4/5] object-cover mix-blend-multiply contrast-105"
-              style={{ maskImage: 'linear-gradient(to bottom, black 80%, transparent 100%)', WebkitMaskImage: 'linear-gradient(to bottom, black 80%, transparent 100%)' }}
-            />
-            <motion.div 
-              className="absolute bottom-12 -left-4 md:-left-12 z-20 bg-white p-6 rounded-3xl shadow-xl border border-slate-100 hidden sm:block"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.5 }}
+          
+          <div className="flex justify-center relative">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 1 }}
+              className="relative"
             >
-              <div className="flex items-center gap-4">
-                <div className="bg-indigo-100 p-3 rounded-2xl">
-                  <Code className="w-8 h-8 text-indigo-600" />
-                </div>
-                <div>
-                  <p className="text-2xl font-bold text-slate-900">4+</p>
-                  <p className="text-sm font-medium text-slate-500">Years Exp.</p>
-                </div>
-              </div>
+              <div className="absolute inset-0 bg-gradient-to-tr from-indigo-500 to-purple-500 rounded-full blur-3xl opacity-30 animate-pulse"></div>
+              <img 
+                src={settings.profileImageUrl || "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"} 
+                alt={settings.name || "Profile"} 
+                className="w-72 h-72 sm:w-96 sm:h-96 object-cover rounded-full border-4 border-white/10 relative z-10 shadow-2xl"
+              />
             </motion.div>
-          </motion.div>
+          </div>
         </div>
       </section>
-
       {/* Quote Section */}
-      <ScrollReveal className="max-w-5xl mx-auto w-full py-12">
+      <ScrollReveal className="max-w-5xl mx-auto w-full py-12 px-4 sm:px-6 lg:px-8">
         <div className="bg-slate-900 rounded-3xl p-10 md:p-16 text-center shadow-2xl relative overflow-hidden flex flex-col items-center justify-center">
           <div className="absolute top-0 right-0 -mr-20 -mt-20 w-64 h-64 bg-indigo-600/30 rounded-full blur-3xl"></div>
           <div className="absolute bottom-0 left-0 -ml-20 -mb-20 w-64 h-64 bg-purple-600/30 rounded-full blur-3xl"></div>
@@ -161,48 +162,51 @@ export default function Home() {
       </ScrollReveal>
 
       {/* Skills Preview */}
-      <ScrollReveal className="max-w-5xl mx-auto w-full">
+      <ScrollReveal className="max-w-5xl mx-auto w-full px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
           <span className="text-indigo-600 font-bold tracking-wider uppercase text-sm mb-2 block">What I Do</span>
           <h2 className="text-4xl font-extrabold text-slate-900">Technical Expertise</h2>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {[
-            { title: 'Frontend', icon: <Globe className="w-8 h-8 text-blue-500 mb-4" />, items: ['React', 'Next.js', 'TypeScript', 'Tailwind CSS'] },
-            { title: 'Backend', icon: <Terminal className="w-8 h-8 text-indigo-500 mb-4" />, items: ['Node.js', 'Express', 'PostgreSQL', 'Prisma'] },
-            { title: 'Cloud & Architecture', icon: <Database className="w-8 h-8 text-sky-500 mb-4" />, items: ['AWS', 'Vercel', 'Docker', 'System Design'] },
-          ].map((area, i) => (
-            <motion.div 
-              key={area.title}
-              className="bg-white p-10 rounded-3xl shadow-sm border border-slate-100 text-left flex flex-col items-start hover:shadow-xl hover:border-indigo-100 transition-all duration-300 group"
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.1 }}
-            >
-              <div className="p-4 bg-slate-50 rounded-2xl group-hover:bg-indigo-50 transition-colors mb-6">
-                {area.icon}
-              </div>
-              <h3 className="text-2xl font-bold mb-4 text-slate-900">{area.title}</h3>
-              <ul className="space-y-3 w-full">
-                {area.items.map(item => (
-                  <li key={item} className="flex items-center text-slate-600 font-medium">
-                    <Code className="w-4 h-4 mr-3 text-indigo-400" /> {item}
-                  </li>
-                ))}
-              </ul>
-            </motion.div>
-          ))}
+          {whatIDo.length > 0 ? whatIDo.map((area, i) => {
+            const IconComp = area.icon === 'Globe' ? Globe : area.icon === 'Database' ? Database : area.icon === 'Code' ? Code : Terminal;
+            const items = area.items ? area.items.split(',').map(s => s.trim()) : [];
+            return (
+              <motion.div 
+                key={area.title}
+                className="bg-white p-10 rounded-3xl shadow-sm border border-slate-100 text-left flex flex-col items-start hover:shadow-xl hover:border-indigo-100 transition-all duration-300 group"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.1 }}
+              >
+                <div className="p-4 bg-slate-50 rounded-2xl group-hover:bg-indigo-50 transition-colors mb-6">
+                  <IconComp className="w-8 h-8 text-indigo-500 mb-4" />
+                </div>
+                <h3 className="text-2xl font-bold mb-4 text-slate-900">{area.title}</h3>
+                <ul className="space-y-3 w-full">
+                  {items.map(item => (
+                    <li key={item} className="flex items-center text-slate-600 font-medium">
+                      <Code className="w-4 h-4 mr-3 text-indigo-400" /> {item}
+                    </li>
+                  ))}
+                </ul>
+              </motion.div>
+            );
+          }) : (
+            <div className="col-span-1 md:col-span-3 text-center text-slate-500 py-12">
+              Loading expertise...
+            </div>
+          )}
         </div>
       </ScrollReveal>
-
       {/* Testimonials Section */}
-      <ScrollReveal className="w-full">
+      <ScrollReveal className="w-full px-4 sm:px-6 lg:px-8">
         <TestimonialSection />
       </ScrollReveal>
 
       {/* Quotes Section */}
-      <ScrollReveal className="max-w-4xl mx-auto w-full py-16">
+      <ScrollReveal className="max-w-4xl mx-auto w-full py-16 px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
           <span className="text-indigo-600 font-bold tracking-wider uppercase text-sm mb-2 block">My Philosophy</span>
           <h2 className="text-4xl font-extrabold text-slate-900">Quotes & Principles</h2>
@@ -242,7 +246,7 @@ export default function Home() {
       </ScrollReveal>
 
       {/* Blog Preview Section */}
-      <ScrollReveal className="max-w-6xl mx-auto w-full py-12">
+      <ScrollReveal className="max-w-6xl mx-auto w-full py-12 px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-end mb-12">
           <div>
             <span className="text-indigo-600 font-bold tracking-wider uppercase text-sm mb-2 block">Latest Insights</span>
