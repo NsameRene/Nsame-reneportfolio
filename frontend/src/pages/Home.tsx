@@ -91,8 +91,8 @@ export default function Home() {
               {settings.name || "Nsame Reneta Mjong"}
             </h1>
             
-            <div className="text-2xl sm:text-3xl font-medium text-indigo-300 mb-8 h-10">
-              <TypewriterText text="Full Stack Developer & Software Engineer" delay={0.5} />
+            <div className="text-2xl sm:text-3xl font-medium text-indigo-300 mb-8 min-h-12">
+              <TypewriterText text="Founder & CEO of ELIGNITE • Project Manager for EduIgnite & JuniorIgnite" delay={0.5} />
             </div>
             
             <motion.p 
@@ -101,7 +101,7 @@ export default function Home() {
               animate={{ opacity: 1 }}
               transition={{ delay: 1, duration: 1 }}
             >
-              {settings.bio || "I build elegant, scalable, and user-centric applications. Let's create something amazing together."}
+              {settings.bio || "I am Nsame Rene Tamjong, Founder & CEO of ELIGNITE, Project Manager of EduIgnite and JuniorIgnite, and a coder, entrepreneur, educator, mathematics teacher, and mentor focused on educational technology and product building."}
             </motion.p>
             
             <motion.div 
@@ -130,8 +130,10 @@ export default function Home() {
               <div className="absolute inset-0 bg-gradient-to-tr from-indigo-500 to-purple-500 rounded-full blur-3xl opacity-30 animate-pulse"></div>
               <img 
                 src={settings.profileImageUrl || "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"} 
-                alt={settings.name || "Profile"} 
+                alt={settings.name || "Nsame Rene Tamjong, founder and CEO of ELIGNITE"} 
                 className="w-72 h-72 sm:w-96 sm:h-96 object-cover rounded-full border-4 border-white/10 relative z-10 shadow-2xl"
+                loading="lazy"
+                decoding="async"
               />
             </motion.div>
           </div>
@@ -151,10 +153,10 @@ export default function Home() {
             <div className="flex flex-col items-center">
               <div className="w-12 h-1 bg-indigo-500 rounded-full mb-4"></div>
               <p className="text-xl font-bold tracking-widest uppercase text-slate-300">
-                Nsame Rene
+                Nsame Rene Tamjong
               </p>
               <p className="text-sm font-medium text-slate-500 mt-2">
-                Software Engineer
+                Founder & CEO of ELIGNITE • Project Manager • Educator
               </p>
             </div>
           </div>
@@ -170,7 +172,7 @@ export default function Home() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {whatIDo.length > 0 ? whatIDo.map((area, i) => {
             const IconComp = area.icon === 'Globe' ? Globe : area.icon === 'Database' ? Database : area.icon === 'Code' ? Code : Terminal;
-            const items = area.items ? area.items.split(',').map(s => s.trim()) : [];
+            const items = area.items ? area.items.split(',').map((s: string) => s.trim()) : [];
             return (
               <motion.div 
                 key={area.title}
@@ -185,7 +187,7 @@ export default function Home() {
                 </div>
                 <h3 className="text-2xl font-bold mb-4 text-slate-900">{area.title}</h3>
                 <ul className="space-y-3 w-full">
-                  {items.map(item => (
+                  {items.map((item: string) => (
                     <li key={item} className="flex items-center text-slate-600 font-medium">
                       <Code className="w-4 h-4 mr-3 text-indigo-400" /> {item}
                     </li>

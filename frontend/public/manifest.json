@@ -1,0 +1,17 @@
+{
+  "name": "Nsame Rene Tamjong | ELIGNITE Portfolio",
+  "short_name": "Nsame Rene",
+  "description": "Portfolio of Nsame Rene Tamjong, Founder & CEO of ELIGNITE, Project Manager for EduIgnite and JuniorIgnite, educator, entrepreneur, and technology innovator.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f8fafc",
+  "theme_color": "#4f46e5",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

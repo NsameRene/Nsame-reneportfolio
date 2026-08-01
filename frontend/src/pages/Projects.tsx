@@ -19,9 +19,9 @@ export default function Projects() {
   return (
     <div className="py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto min-h-screen">
       <ScrollReveal className="mb-16">
-        <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-slate-900 mb-6">Featured Projects</h1>
+        <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-slate-900 mb-6">Projects by Nsame Rene Tamjong</h1>
         <p className="text-xl text-slate-600 max-w-3xl leading-relaxed">
-          Here are a few select projects that showcase my expertise in modern web development, architecture, and design.
+          Discover the products and platforms behind ELIGNITE, EduIgnite, and JuniorIgnite, built to advance education technology, product development, and digital innovation.
         </p>
       </ScrollReveal>
       
@@ -40,8 +40,10 @@ export default function Projects() {
                     <div className="absolute inset-0 bg-slate-900/10 group-hover:bg-transparent transition-colors z-10" />
                     <img 
                       src={project.imageUrl || 'https://images.unsplash.com/photo-1557821552-17105176677c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'} 
-                      alt={project.title} 
+                      alt={`${project.title} by Nsame Rene Tamjong`} 
                       className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700 ease-out"
+                      loading="lazy"
+                      decoding="async"
                     />
                   </div>
                 </div>

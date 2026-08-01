@@ -8,10 +8,10 @@ export default function About() {
     <div className="py-12 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto overflow-hidden">
       <ScrollReveal className="mb-16 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
         <div>
-          <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-slate-900 mb-6">About Me</h1>
+          <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-slate-900 mb-6">About Nsame Rene Tamjong</h1>
           <div className="prose prose-lg text-slate-600 max-w-none">
             <p className="text-xl leading-relaxed">
-              I am a <strong>Full Stack Software Engineer</strong> and <strong>Mathematics Educator</strong> with a passion for building scalable, high-performance web applications. As the Founder and CEO of ELIGNITE, and the creator of the EduIgnite School Management System, I bridge the gap between complex technical solutions and intuitive educational tools.
+              I am <strong>Nsame Rene Tamjong</strong>, the <strong>Founder & CEO of ELIGNITE</strong>, a <strong>Project Manager</strong> for <strong>EduIgnite</strong> and <strong>JuniorIgnite</strong>, and a <strong>coder</strong>, <strong>entrepreneur</strong>, <strong>educator</strong>, <strong>mathematics teacher</strong>, and <strong>mentor</strong>. I build digital products and educational technology solutions that help schools, learners, and teams thrive.
             </p>
           </div>
         </div>
@@ -19,8 +19,10 @@ export default function About() {
           <div className="absolute inset-0 bg-indigo-100 rounded-3xl transform rotate-3 scale-105"></div>
           <img 
             src="https://images.unsplash.com/photo-1560250097-0b93528c311a?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" 
-            alt="Nsame Rene Tamjong" 
+            alt="Nsame Rene Tamjong, founder and CEO of ELIGNITE" 
             className="relative z-10 rounded-3xl shadow-xl w-full object-cover aspect-square md:aspect-[4/3]"
+            loading="lazy"
+            decoding="async"
           />
         </div>
       </ScrollReveal>
@@ -31,7 +33,7 @@ export default function About() {
             <Target className="w-6 h-6 text-indigo-600" />
           </div>
           <h3 className="text-2xl font-bold text-slate-900 mb-4">Vision</h3>
-          <p className="text-slate-600">To revolutionize the digital landscape by creating seamless, accessible, and highly efficient software solutions that empower organizations and educational institutions globally.</p>
+          <p className="text-slate-600">To build accessible, scalable digital products and educational technology platforms that strengthen learning, operations, and innovation across Africa and beyond.</p>
         </div>
 
         <div className="bg-white p-8 rounded-3xl shadow-sm border border-slate-100 hover:shadow-md transition-shadow">
@@ -39,7 +41,7 @@ export default function About() {
             <Lightbulb className="w-6 h-6 text-emerald-600" />
           </div>
           <h3 className="text-2xl font-bold text-slate-900 mb-4">Mission</h3>
-          <p className="text-slate-600">Delivering premium, full-stack applications with clean architecture and outstanding user experiences. My focus is on leveraging modern technologies like Next.js, Express, and PostgreSQL to solve real-world problems.</p>
+          <p className="text-slate-600">Delivering premium full stack applications with clean architecture and outstanding user experiences. My focus is on leveraging React, TypeScript, Node.js, PostgreSQL, and AI solutions to solve real-world problems in education and technology.</p>
         </div>
       </ScrollReveal>
 
@@ -47,7 +49,7 @@ export default function About() {
         <div className="mb-8 md:mb-0 md:mr-8">
           <h3 className="text-2xl font-bold mb-4">Education & Background</h3>
           <p className="text-slate-300 max-w-xl leading-relaxed">
-            My background as a Mathematics Educator has instilled in me a deep appreciation for logic, problem-solving, and algorithmic thinking—skills that translate perfectly into writing clean, efficient code for complex web systems.
+            My background as a mathematics teacher and educational technology innovator has instilled in me a deep appreciation for logic, problem-solving, and algorithmic thinking—skills that translate perfectly into writing clean, efficient code for complex web systems and digital learning platforms.
           </p>
         </div>
         <div className="flex-shrink-0">
