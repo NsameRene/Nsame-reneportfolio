@@ -11,13 +11,31 @@ declare global {
   var _postgresPool: pg.Pool | undefined;
 }
 
+const getConnectionString = (): string | undefined => {
+  if (process.env.DATABASE_URL) {
+    return process.env.DATABASE_URL;
+  }
+
+  if (process.env.SQL_HOST && process.env.SQL_USER && process.env.SQL_PASSWORD && process.env.SQL_DB_NAME) {
+    return `postgres://${process.env.SQL_USER}:${process.env.SQL_PASSWORD}@${process.env.SQL_HOST}/${process.env.SQL_DB_NAME}`;
+  }
+
+  return undefined;
+};
+
+export const validateDatabaseConfig = () => {
+  const connectionString = getConnectionString();
+
+  if (!connectionString) {
+    throw new Error(
+      'Database configuration is missing. Set DATABASE_URL, or SQL_HOST, SQL_USER, SQL_PASSWORD, and SQL_DB_NAME in the environment.'
+    );
+  }
+};
+
 export const createPool = () => {
   if (!global._postgresPool) {
-    const connectionString = process.env.DATABASE_URL || (
-      process.env.SQL_HOST && process.env.SQL_USER && process.env.SQL_PASSWORD && process.env.SQL_DB_NAME
-        ? `postgres://${process.env.SQL_USER}:${process.env.SQL_PASSWORD}@${process.env.SQL_HOST}/${process.env.SQL_DB_NAME}`
-        : undefined
-    );
+    const connectionString = getConnectionString();
 
     const poolConfig = connectionString
       ? { connectionString, max: 10, connectionTimeoutMillis: 15000 }

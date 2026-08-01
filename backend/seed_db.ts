@@ -1,6 +1,7 @@
 import { db } from './src/db/index.js';
 import * as schema from './src/db/schema.js';
-import { sql } from 'drizzle-orm';
+import { eq, sql } from 'drizzle-orm';
+import bcrypt from 'bcryptjs';
 
 async function main() {
   console.log("Checking courses...");
@@ -42,6 +43,22 @@ async function main() {
       { name: "Node.js", category: "Backend", proficiency: 85 },
       { name: "PostgreSQL", category: "Database", proficiency: 80 }
     ]);
+  }
+
+  console.log("Checking admin user...");
+  const adminEmail = 'admin@elignite.com';
+  const adminPassword = 'admin123';
+  const adminUsers = await db.select().from(schema.users).where(eq(schema.users.email, adminEmail));
+  if (adminUsers.length === 0) {
+    console.log(`Inserting admin user ${adminEmail}...`);
+    const hashedPassword = await bcrypt.hash(adminPassword, 10);
+    await db.insert(schema.users).values({
+      email: adminEmail,
+      password: hashedPassword,
+      name: 'Admin',
+      role: 'admin',
+    });
+    console.log(`Admin user seeded: ${adminEmail} / ${adminPassword}`);
   }
 
   console.log("Checking settings...");

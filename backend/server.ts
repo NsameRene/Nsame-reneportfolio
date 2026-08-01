@@ -4,8 +4,11 @@ import fs from "fs";
 import path from "path";
 import cors from "cors";
 import { setupRoutes } from "./src/routes/index.js";
+import { validateDatabaseConfig } from "./src/db/index.js";
 
 dotenv.config();
+
+validateDatabaseConfig();
 
 async function startServer() {
   const app = express();
