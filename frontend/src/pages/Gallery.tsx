@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Play, Image as ImageIcon, X } from 'lucide-react';
 import ScrollReveal from '../components/ScrollReveal';
-import { API_BASE } from '../utils/api';
+import { getApiUrl } from '../utils/api';
 
 export default function Gallery() {
   const [galleryItems, setGalleryItems] = useState([]);
@@ -11,7 +11,7 @@ export default function Gallery() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch(`${API_BASE}/api/gallery`)
+    fetch(getApiUrl('/api/gallery'))
       .then(res => res.json())
       .then(data => setGalleryItems(data))
       .catch(err => console.error(err))

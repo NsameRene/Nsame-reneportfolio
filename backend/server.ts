@@ -13,11 +13,32 @@ async function startServer() {
     process.env.VITE_API_URL,
     "http://localhost:5173",
     "http://127.0.0.1:5173",
+    "https://nsamerenetamjong.vercel.app",
+    "https://nsamerenetamjong.com",
+    "https://www.nsamerenetamjong.com",
   ].filter(Boolean);
 
   app.use(
     cors({
-      origin: allowedOrigins.length > 0 ? allowedOrigins : true,
+      origin: (origin, callback) => {
+        if (!origin) {
+          callback(null, true);
+          return;
+        }
+
+        if (
+          allowedOrigins.includes(origin) ||
+          /https:\/\/.*\.vercel\.app$/i.test(origin) ||
+          /https:\/\/.*\.vercel\.dev$/i.test(origin) ||
+          /http:\/\/localhost(:\d+)?$/i.test(origin) ||
+          /http:\/\/127\.0\.0\.1(:\d+)?$/i.test(origin)
+        ) {
+          callback(null, true);
+          return;
+        }
+
+        callback(new Error(`Origin not allowed by CORS: ${origin}`));
+      },
       credentials: true,
     })
   );

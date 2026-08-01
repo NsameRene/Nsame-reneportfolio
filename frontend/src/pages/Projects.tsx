@@ -2,14 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { Github, ExternalLink } from 'lucide-react';
 import ScrollReveal from '../components/ScrollReveal';
-import { API_BASE } from '../utils/api';
+import { getApiUrl } from '../utils/api';
 
 export default function Projects() {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch(`${API_BASE}/api/projects`)
+    fetch(getApiUrl('/api/projects'))
       .then(res => res.json())
       .then(data => setProjects(data))
       .catch(err => console.error(err))

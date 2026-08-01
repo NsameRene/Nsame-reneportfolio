@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Mail, MapPin, Globe, Phone, ExternalLink, Briefcase, GraduationCap, Award, CheckCircle2 } from 'lucide-react';
-import { API_BASE } from '../utils/api';
+import { getApiUrl } from '../utils/api';
 
 export default function CV() {
   const [data, setData] = useState({
@@ -17,11 +17,11 @@ export default function CV() {
     const fetchData = async () => {
       try {
         const [exp, edu, ski, cert, settingsData] = await Promise.all([
-          fetch(`${API_BASE}/api/experiences`).then(res => res.json()),
-          fetch(`${API_BASE}/api/education`).then(res => res.json()),
-          fetch(`${API_BASE}/api/skills`).then(res => res.json()),
-          fetch(`${API_BASE}/api/certificates`).then(res => res.json()),
-          fetch(`${API_BASE}/api/settings`).then(res => res.json())
+          fetch(getApiUrl('/api/experiences')).then(res => res.json()),
+          fetch(getApiUrl('/api/education')).then(res => res.json()),
+          fetch(getApiUrl('/api/skills')).then(res => res.json()),
+          fetch(getApiUrl('/api/certificates')).then(res => res.json()),
+          fetch(getApiUrl('/api/settings')).then(res => res.json())
         ]);
         setData({
           experiences: exp,

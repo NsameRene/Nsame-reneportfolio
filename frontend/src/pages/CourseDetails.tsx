@@ -3,7 +3,7 @@ import { useParams, Link } from 'react-router';
 import { motion, AnimatePresence } from 'motion/react';
 import { ArrowLeft, Clock, PlayCircle, Star, Users, CheckCircle, Award, MessageCircle } from 'lucide-react';
 import ScrollReveal from '../components/ScrollReveal';
-import { API_BASE } from '../utils/api';
+import { getApiUrl } from '../utils/api';
 
 export default function CourseDetails() {
   const { id } = useParams();
@@ -14,7 +14,7 @@ export default function CourseDetails() {
   const [certForm, setCertForm] = useState({ name: '', email: '', reason: '' });
 
   useEffect(() => {
-    fetch(`${API_BASE}/api/courses`)
+    fetch(getApiUrl('/api/courses'))
       .then(res => res.json())
       .then(data => {
         const found = data.find((c: any) => c.id === parseInt(id || '0'));

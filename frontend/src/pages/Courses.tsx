@@ -3,14 +3,14 @@ import { motion } from 'motion/react';
 import { BookOpen, Clock, Star, PlayCircle, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router';
 import ScrollReveal from '../components/ScrollReveal';
-import { API_BASE } from '../utils/api';
+import { getApiUrl } from '../utils/api';
 
 export default function Courses() {
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch(`${API_BASE}/api/courses`)
+    fetch(getApiUrl('/api/courses'))
       .then(res => res.json())
       .then(data => setCourses(data))
       .catch(err => console.error(err))

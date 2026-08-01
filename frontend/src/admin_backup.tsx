@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { LogOut, LayoutDashboard, Briefcase, FileText, FileBadge, MessageSquare, Settings, Plus, Edit2, Trash2, ShieldCheck, Mail, Lock, BookOpen, Quote, Image as ImageIcon, X } from 'lucide-react';
+import { getApiUrl } from './utils/api';
 
 export default function Admin() {
   const [user, setUser] = useState<any | null>(null);
@@ -20,10 +21,10 @@ export default function Admin() {
 
   const fetchItems = async () => {
     try {
-      const projRes = await fetch('/api/projects');
+      const projRes = await fetch(getApiUrl('/api/projects'));
       if (projRes.ok) setProjects(await projRes.json());
       
-      const blogRes = await fetch('/api/blogs');
+      const blogRes = await fetch(getApiUrl('/api/blogs'));
       if (blogRes.ok) setBlogs(await blogRes.json());
     } catch (err) {
       console.error(err);
@@ -33,7 +34,7 @@ export default function Admin() {
   useEffect(() => {
     const token = localStorage.getItem('admin_token');
     if (token) {
-      fetch('/api/auth/check', {
+      fetch(getApiUrl('/api/auth/check'), {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${token}` }
       })
@@ -59,7 +60,7 @@ export default function Admin() {
       setLoading(true);
       setAuthError('');
       
-      const res = await fetch('/api/auth/login', {
+      const res = await fetch(getApiUrl('/api/auth/login'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password })
@@ -91,7 +92,7 @@ export default function Admin() {
     if (!confirm('Are you sure you want to delete this item?')) return;
     try {
       const token = localStorage.getItem('admin_token');
-      await fetch(`/api/${type}/${id}`, {
+      await fetch(getApiUrl(`/api/${type}/${id}`), {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });
@@ -106,7 +107,7 @@ export default function Admin() {
     const token = localStorage.getItem('admin_token');
     const formData = new FormData(e.target as HTMLFormElement);
     
-    let url = `/api/${activeTab.toLowerCase()}`;
+    let url = getApiUrl(`/api/${activeTab.toLowerCase()}`);
     let method = 'POST';
 
     if (editingItem) {

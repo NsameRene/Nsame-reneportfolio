@@ -1,4 +1,4 @@
-import { API_BASE } from '../utils/api';
+import { getApiUrl } from '../utils/api';
 import { motion } from 'motion/react';
 import { ArrowRight, Calendar, Clock, Tag } from 'lucide-react';
 import { Link } from 'react-router';
@@ -10,7 +10,7 @@ export default function Blog() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch(API_BASE + '/api/blogs')
+    fetch(getApiUrl('/api/blogs'))
       .then(res => res.json())
       .then(data => setBlogPosts(data))
       .catch(err => console.error(err))

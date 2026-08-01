@@ -1,4 +1,4 @@
-import { API_BASE } from '../utils/api';
+import { getApiUrl } from '../utils/api';
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Send, Mail, MapPin, CheckCircle, ArrowRight, ArrowLeft } from 'lucide-react';
@@ -17,7 +17,7 @@ export default function Contact() {
     setStatus('loading');
     
     try {
-      const res = await fetch(API_BASE + '/api/contact', {
+      const res = await fetch(getApiUrl('/api/contact'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)

@@ -3,14 +3,14 @@ import { motion } from 'motion/react';
 import { Star, ArrowLeft } from 'lucide-react';
 import { Link } from 'react-router';
 import ScrollReveal from '../components/ScrollReveal';
-import { API_BASE } from '../utils/api';
+import { getApiUrl } from '../utils/api';
 
 export default function Testimonials() {
   const [testimonials, setTestimonials] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch(`${API_BASE}/api/quotes`)
+    fetch(getApiUrl('/api/quotes'))
       .then(res => res.json())
       .then(data => setTestimonials(data))
       .catch(err => console.error(err))

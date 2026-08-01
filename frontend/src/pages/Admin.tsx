@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { API_BASE } from '../utils/api';
+import { getApiUrl } from '../utils/api';
 import { LogOut, LayoutDashboard, Cpu, Briefcase, FileText, FileBadge, MessageSquare, Settings, Plus, Edit2, Trash2, ShieldCheck, Mail, Lock, BookOpen, Quote, Image as ImageIcon, X } from 'lucide-react';
 
 export default function Admin() {
@@ -36,7 +36,7 @@ export default function Admin() {
       const results: Record<string, any[]> = {};
       
       for (const ep of endpoints) {
-        const res = await fetch(`${API_BASE}/api/${ep}`);
+        const res = await fetch(getApiUrl(`/api/${ep}`));
         if (res.ok) {
           results[ep] = await res.json();
         }
@@ -50,7 +50,7 @@ export default function Admin() {
   useEffect(() => {
     const token = localStorage.getItem('admin_token');
     if (token) {
-      fetch(`${API_BASE}/api/auth/check`, {
+      fetch(getApiUrl('/api/auth/check'), {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${token}` }
       })
@@ -76,7 +76,7 @@ export default function Admin() {
       setLoading(true);
       setAuthError('');
       
-      const res = await fetch(`${API_BASE}/api/auth/login`, {
+      const res = await fetch(getApiUrl('/api/auth/login'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password })
@@ -108,7 +108,7 @@ export default function Admin() {
     if (!confirm('Are you sure you want to delete this item?')) return;
     try {
       const token = localStorage.getItem('admin_token');
-      await fetch(`${API_BASE}/api/${type}/${id}`, {
+      await fetch(getApiUrl(`/api/${type}/${id}`), {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });
@@ -128,7 +128,7 @@ export default function Admin() {
       type = cvSubTab;
     }
 
-    let url = `/api/${type}`;
+    let url = getApiUrl(`/api/${type}`);
     let method = 'POST';
 
     if (editingItem) {

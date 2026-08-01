@@ -1,7 +1,7 @@
 import { motion, useMotionValue, useTransform, animate, useInView } from 'motion/react';
 import { ArrowRight, Terminal, Code, Database, Globe, Download, Mail, Quote } from 'lucide-react';
 import { Link } from 'react-router';
-import { API_BASE } from '../utils/api';
+import { getApiUrl } from '../utils/api';
 import { useEffect, useRef, useState } from 'react';
 import TestimonialSection from '../components/TestimonialSection';
 import ScrollReveal from '../components/ScrollReveal';
@@ -38,12 +38,12 @@ export default function Home() {
   const [settings, setSettings] = useState<any>({});
   const [whatIDo, setWhatIDo] = useState<any[]>([]);
   useEffect(() => {
-    fetch(`${API_BASE}/api/what_i_do`).then(res => res.json()).then(data => setWhatIDo(data)).catch(console.error);
+    fetch(getApiUrl('/api/what_i_do')).then(res => res.json()).then(data => setWhatIDo(data)).catch(console.error);
   }, []);
 
   
   useEffect(() => {
-    fetch(`${API_BASE}/api/settings`)
+    fetch(getApiUrl('/api/settings'))
       .then(res => res.json())
       .then(data => setSettings(data))
       .catch(err => console.error(err));
