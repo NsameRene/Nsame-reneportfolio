@@ -37,8 +37,21 @@ export const createPool = () => {
   if (!global._postgresPool) {
     const connectionString = getConnectionString();
 
+// When using a managed provider DATABASE_URL, enable SSL with
+    // rejectUnauthorized=false so Render/Heroku-style Postgres works without
+    // requiring CA bundles. For local connection parameters, keep the default
+    // client behavior.
     const poolConfig = connectionString
-      ? { connectionString, max: 10, connectionTimeoutMillis: 15000 }
+      ? {
+          connectionString,
+          max: 10,
+          connectionTimeoutMillis: 15000,
+          ssl: process.env.DATABASE_URL
+            ? {
+                rejectUnauthorized: false,
+              }
+            : undefined,
+        }
       : {
           host: process.env.SQL_HOST || 'localhost',
           user: process.env.SQL_USER || 'postgres',
