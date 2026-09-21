@@ -4,13 +4,13 @@
 |---|---|---|
 | `frontend/` | Vite + React 19 + TypeScript + Tailwind 4 | **Vercel** |
 | `backend/` | Django 5.2 LTS + Django REST Framework + SimpleJWT | **PythonAnywhere** |
-| Database | MySQL (PythonAnywhere free plan) · PostgreSQL (paid / other hosts) · SQLite (local) | PythonAnywhere |
+| Database | SQLite (default; works on PythonAnywhere's free plan) · MySQL / PostgreSQL optional on paid plans | PythonAnywhere |
 
 ```
  Browser ──► Vercel (React SPA, static)
                 │  fetch(VITE_API_URL + "/api/...")   JSON + Bearer JWT
                 ▼
-            PythonAnywhere (Django + DRF)  ──►  MySQL / PostgreSQL
+            PythonAnywhere (Django + DRF)  ──►  SQLite file (backend/db.sqlite3)
                 │  /media/ (uploads)  /static/ (admin assets)
                 └► Django Admin at /admin/  (manage all content, read messages)
 ```
@@ -72,7 +72,7 @@ Requirements: Python 3.10+ (tested on 3.12) and Node 20+.
 cd backend
 python -m venv .venv
 source .venv/bin/activate            # Windows: .venv\Scripts\activate
-pip install -r requirements.txt      # mysqlclient is only needed for MySQL; see note below
+pip install -r requirements.txt
 cp .env.example .env                 # local dev works with an empty SECRET_KEY / DATABASE_URL
 python manage.py migrate             # creates db.sqlite3
 python manage.py seed_demo           # optional: demo content
@@ -84,11 +84,6 @@ cd frontend
 npm install
 npm run dev                          # talks to http://127.0.0.1:8000 by default
 ```
-
-> `mysqlclient` (the MySQL driver used on PythonAnywhere) installs from a prebuilt wheel on Windows
-> and PythonAnywhere. On Linux/macOS it needs the MySQL client headers first
-> (`sudo apt install libmysqlclient-dev pkg-config`, or `brew install mysql-client pkg-config`).
-> Local development itself uses SQLite and never imports it.
 
 * React admin dashboard: <http://localhost:5173/admin> (log in with the superuser's **email** + password).
 * Django Admin: <http://127.0.0.1:8000/admin/> (log in with the superuser's **username** + password).
@@ -148,8 +143,7 @@ Caveats printed by the command:
 
 ## Deploying the backend to PythonAnywhere
 
-Replace `YOUR_USERNAME` everywhere. (EU accounts use `eu.pythonanywhere.com` and
-`YOUR_USERNAME.mysql.eu.pythonanywhere-services.com`.)
+Replace `YOUR_USERNAME` everywhere. (EU accounts use `eu.pythonanywhere.com`.)
 
 ### 1. Create the web app
 Web tab → **Add a new web app** → *your-username.pythonanywhere.com* → **Manual configuration**
@@ -169,22 +163,21 @@ pip install -r backend/requirements.txt
 
 Web tab → **Virtualenv** → enter `/home/YOUR_USERNAME/.virtualenvs/portfolio-venv`.
 
-### 3. Create the database
-Databases tab → set a MySQL password → create a database named `portfolio`
-(the full name becomes `YOUR_USERNAME$portfolio`). Its URL is:
+### 3. Database
+**Nothing to create.** The backend uses SQLite by default: `python manage.py migrate` (step 7) creates
+the file `backend/db.sqlite3`. SQLite is the database available on PythonAnywhere's free plan and is plenty for a
+one-owner portfolio (reads dominate; the few writes are contact messages and testimonies).
+The file is git-ignored, is not under any web-mapped folder, and survives `git pull` and reloads.
+**Back it up** (see [Backups](#backups)); it holds all your content and messages.
 
-```
-mysql://YOUR_USERNAME:DB_PASSWORD@YOUR_USERNAME.mysql.pythonanywhere-services.com/YOUR_USERNAME%24portfolio
-```
-
-(`%24` is the URL-encoded `$`; percent-encode any special characters in the password.)
-PostgreSQL (paid plans) works too: install `psycopg[binary]` and use a `postgres://…` URL.
+On a paid plan you can use MySQL/PostgreSQL instead: install the driver (`pip install mysqlclient` or
+`pip install "psycopg[binary]"`) and set `DATABASE_URL` in `.env` (examples in `backend/.env.example`).
 
 ### 4. Environment variables
 ```bash
 cd ~/Nsame-reneportfolio/backend
 cp .env.example .env
-python -c "from django.core.management.utils import get_random_secret_key as g; print(g())"   # copy the output
+python -c "import secrets; print(secrets.token_urlsafe(50))"   # copy the output
 nano .env
 ```
 
@@ -195,12 +188,11 @@ DJANGO_SETTINGS_MODULE=config.settings.production
 SECRET_KEY=<the generated key>
 DEBUG=False
 ALLOWED_HOSTS=YOUR_USERNAME.pythonanywhere.com
-DATABASE_URL=mysql://YOUR_USERNAME:DB_PASSWORD@YOUR_USERNAME.mysql.pythonanywhere-services.com/YOUR_USERNAME%24portfolio
 FRONTEND_URL=https://your-portfolio.vercel.app
 ```
 
-Production settings **refuse to start** if `SECRET_KEY`, `ALLOWED_HOSTS`, `DATABASE_URL`
-or `FRONTEND_URL` is missing. The `.env` file is git-ignored; never commit it.
+Production settings **refuse to start** if `SECRET_KEY`, `ALLOWED_HOSTS` or `FRONTEND_URL` is missing.
+`DATABASE_URL` is optional (SQLite when absent). The `.env` file is git-ignored; never commit it.
 
 ### 5. WSGI file
 Web tab → **WSGI configuration file** → replace its contents with
@@ -262,10 +254,29 @@ Always read the **error log** first (Web tab → *Error log*).
 | `'Settings' object has no attribute 'ROOT_URLCONF'` | The WSGI file points at the wrong settings module (usually `config.settings`, or PythonAnywhere's default `mysite.settings`). It must say `os.environ["DJANGO_SETTINGS_MODULE"] = "config.settings.production"`. Replace the **whole** WSGI file with `backend/pythonanywhere_wsgi.py`, then Reload. |
 | `ModuleNotFoundError: No module named 'config'` | `PROJECT_HOME` in the WSGI file is wrong. It must be the folder that contains `manage.py`, e.g. `/home/YOUR_USERNAME/Nsame-reneportfolio/backend`. |
 | `ModuleNotFoundError: No module named 'django'` (or `rest_framework`, `dotenv`, …) | The Web tab **Virtualenv** path is not set or points at the wrong folder. It must be the virtualenv you ran `pip install -r requirements.txt` in. |
-| `ImproperlyConfigured: SECRET_KEY / ALLOWED_HOSTS / DATABASE_URL / FRONTEND_URL must be set` | `backend/.env` is missing, misspelled, or in the wrong folder. It must be `backend/.env` (next to `manage.py`). |
-| `django.db.utils.OperationalError: (1045, "Access denied…")` or `(2002, …)` | Wrong DB user/password/host in `DATABASE_URL`. Copy the values from the Databases tab and percent-encode special characters in the password. |
+| `ImproperlyConfigured: SECRET_KEY / ALLOWED_HOSTS / FRONTEND_URL must be set` | `backend/.env` is missing, misspelled, or in the wrong folder. It must be `backend/.env` (next to `manage.py`). |
+| `OperationalError: unable to open database file` | The folder holding `db.sqlite3` is not writable, or `DATABASE_URL` points at a wrong path. Remove `DATABASE_URL` from `.env` to use `backend/db.sqlite3`. |
+| `OperationalError: database is locked` | Two requests wrote at the same time and one waited more than 20 s. Rare on a portfolio; retry, and check for a long-running console command holding the database. |
 | Admin pages have no CSS | Run `python manage.py collectstatic --noinput` and check the `/static/` mapping on the Web tab. |
 | Browser console: `blocked by CORS policy` | `FRONTEND_URL` on PythonAnywhere does not exactly match the Vercel URL (scheme included, no trailing slash). Fix it and Reload. |
+
+### Backups
+
+SQLite keeps everything in `backend/db.sqlite3` (content, testimonies, messages, admin users), and uploads live in
+`backend/media/`. PythonAnywhere does not back these up for you. Make a copy now and then, and before big changes:
+
+```bash
+mkdir -p ~/backups
+cd ~/Nsame-reneportfolio/backend
+python manage.py dumpdata --natural-foreign -e contenttypes -e auth.permission -e sessions --indent 2 > ~/backups/data-$(date +%F).json
+cp db.sqlite3 ~/backups/db-$(date +%F).sqlite3
+tar czf ~/backups/media-$(date +%F).tgz media
+```
+
+Download the files from the *Files* tab. To restore a JSON dump into a fresh database:
+`python manage.py migrate && python manage.py loaddata ~/backups/data-YYYY-MM-DD.json`.
+(On Windows run these with `python -X utf8 manage.py …`, otherwise the shell writes the file in the wrong encoding.)
+Never run `git clean -x` or delete `db.sqlite3` in the project folder; `git pull` does not touch it.
 
 ### 9. Optional: email yourself contact-form messages
 Messages are always stored and visible in Django Admin → *Contact messages*. To also get an

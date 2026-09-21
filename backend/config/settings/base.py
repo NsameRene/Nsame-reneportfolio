@@ -67,10 +67,11 @@ TEMPLATES = [
 ]
 
 # ── Database ────────────────────────────────────────────────────────────────
-# DATABASE_URL examples:
-#   sqlite:///db.sqlite3
-#   mysql://USER:PASSWORD@USER.mysql.pythonanywhere-services.com/USER$portfolio
-#   postgres://USER:PASSWORD@HOST:5432/NAME
+# Default: SQLite file backend/db.sqlite3 (fine for a one-owner portfolio, and the only
+# database available on PythonAnywhere's free plan). Set DATABASE_URL to use another one:
+#   sqlite:////absolute/path/to/db.sqlite3
+#   mysql://USER:PASSWORD@HOST/NAME          (needs the mysqlclient package)
+#   postgres://USER:PASSWORD@HOST:5432/NAME  (needs psycopg)
 # Percent-encode special characters in the password (and "$" as %24 in names).
 DATABASES = {
     "default": dj_database_url.config(
@@ -82,6 +83,10 @@ DATABASES = {
 }
 if DATABASES["default"]["ENGINE"] == "django.db.backends.mysql":
     DATABASES["default"].setdefault("OPTIONS", {}).setdefault("charset", "utf8mb4")
+elif DATABASES["default"]["ENGINE"] == "django.db.backends.sqlite3":
+    # Several web workers may write at once (contact form, admin): wait up to
+    # 20 s for the file lock instead of failing after the default 5 s.
+    DATABASES["default"].setdefault("OPTIONS", {}).setdefault("timeout", 20)
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 

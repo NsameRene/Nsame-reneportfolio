@@ -1,4 +1,4 @@
-# Production dependencies. Tested on Python 3.12; works on PythonAnywhere's
+# Production dependencies. Tested on Python 3.12 and 3.13; works on PythonAnywhere's
 # Python 3.10+ (Django 5.2 LTS needs 3.10 or newer).
 Django>=5.2,<5.3
 djangorestframework>=3.16,<3.17
@@ -9,8 +9,8 @@ python-dotenv>=1.1,<2
 whitenoise>=6.9,<7
 Pillow>=11.0
 
-# Database driver. PythonAnywhere free accounts use MySQL (mysqlclient is
-# pre-built there). For PostgreSQL (paid plans / other hosts) install
-# `psycopg[binary]>=3.2` instead and use a postgres:// DATABASE_URL.
-# SQLite (local development) needs no driver.
-mysqlclient>=2.2
+# Database: SQLite is built into Python, so nothing to install. Only if you switch to
+# another database (paid PythonAnywhere plans, other hosts) install its driver:
+#   MySQL:      pip install mysqlclient
+#   PostgreSQL: pip install "psycopg[binary]"
+# and set DATABASE_URL (see .env.example).
