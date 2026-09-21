@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { getApiUrl } from '../utils/api';
-import { LogOut, LayoutDashboard, Cpu, Briefcase, FileText, FileBadge, MessageSquare, Settings, Plus, Edit2, Trash2, ShieldCheck, Mail, Lock, BookOpen, Quote, Image as ImageIcon, X } from 'lucide-react';
+import { LogOut, LayoutDashboard, Cpu, Briefcase, FileText, FileBadge, MessageSquare, Settings, Plus, Edit2, Trash2, ShieldCheck, Mail, Lock, BookOpen, Quote, Image as ImageIcon, X, Star, Check, EyeOff } from 'lucide-react';
 
 export default function Admin() {
   const [user, setUser] = useState<any | null>(null);
@@ -17,6 +17,7 @@ export default function Admin() {
     blogs: [],
     courses: [],
     quotes: [],
+    testimonials: [],
     gallery: [],
     education: [],
     experiences: [],
@@ -32,11 +33,15 @@ export default function Admin() {
 
   const fetchItems = async () => {
     try {
-      const endpoints = ['projects', 'blogs', 'courses', 'quotes', 'gallery', 'education', 'experiences', 'skills', 'certificates', 'what_i_do'];
+      const endpoints = ['projects', 'blogs', 'courses', 'quotes', 'testimonials', 'gallery', 'education', 'experiences', 'skills', 'certificates', 'what_i_do'];
       const results: Record<string, any[]> = {};
-      
+
       for (const ep of endpoints) {
-        const res = await fetch(getApiUrl(`/api/${ep}`));
+        // Testimonials: the token makes the API include the ones still awaiting approval.
+        const res = await fetch(
+          getApiUrl(`/api/${ep}`),
+          ep === 'testimonials' ? { headers: { Authorization: `Bearer ${localStorage.getItem('admin_token')}` } } : undefined
+        );
         if (res.ok) {
           results[ep] = await res.json();
         }
@@ -118,6 +123,22 @@ export default function Admin() {
     }
   };
 
+  // Approve (publish) or unpublish a visitor testimony.
+  const setApproval = async (id: number, isApproved: boolean) => {
+    try {
+      const res = await fetch(getApiUrl(`/api/testimonials/${id}`), {
+        method: 'PATCH',
+        headers: { 'Authorization': `Bearer ${localStorage.getItem('admin_token')}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ isApproved })
+      });
+      if (!res.ok) throw new Error(`status ${res.status}`);
+      fetchItems();
+    } catch (err) {
+      console.error(err);
+      alert('Could not update the testimony. Please sign in again and retry.');
+    }
+  };
+
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     const token = localStorage.getItem('admin_token');
@@ -137,11 +158,17 @@ export default function Admin() {
     }
 
     try {
-      await fetch(url, {
+      const res = await fetch(url, {
         method,
         headers: { 'Authorization': `Bearer ${token}` },
         body: formData
       });
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        const details = body.details ? Object.entries(body.details).map(([k, v]) => `${k}: ${v}`).join('\n') : '';
+        alert(`Error saving item: ${body.error || res.status}${details ? `\n${details}` : ''}`);
+        return;
+      }
       setIsModalOpen(false);
       fetchItems();
     } catch (err) {
@@ -227,6 +254,7 @@ export default function Admin() {
     { name: 'CV', icon: FileBadge },
     { name: 'Courses', icon: BookOpen },
     { name: 'Quotes', icon: Quote },
+    { name: 'Testimonials', icon: Star },
     { name: 'Gallery', icon: ImageIcon },
     { name: 'What I Do', icon: Cpu },
     { name: 'Messages', icon: MessageSquare },
@@ -244,6 +272,7 @@ export default function Admin() {
   };
 
   const currentList = getListToRender();
+  const pendingTestimonials = (data.testimonials || []).filter(t => !t.isApproved).length;
 
   return (
     <div className="min-h-screen bg-slate-50 p-4 sm:p-6 lg:p-8 flex flex-col md:flex-row gap-6 lg:gap-8 rounded-3xl mb-12">
@@ -273,6 +302,9 @@ export default function Admin() {
               >
                 <Icon className={`w-4 h-4 mr-3 ${isActive ? 'text-indigo-200' : 'text-slate-400'}`} />
                 {item.name}
+                {item.name === 'Testimonials' && pendingTestimonials > 0 && (
+                  <span className="ml-auto text-xs font-bold px-2 py-0.5 rounded-full bg-amber-400 text-slate-900">{pendingTestimonials}</span>
+                )}
               </button>
             )
           })}
@@ -314,6 +346,7 @@ export default function Admin() {
                   { title: 'Total Projects', count: data.projects?.length || 0, color: 'bg-indigo-50 text-indigo-700 border-indigo-100' },
                   { title: 'Published Blogs', count: data.blogs?.length || 0, color: 'bg-emerald-50 text-emerald-700 border-emerald-100' },
                   { title: 'Unread Messages', count: '0', color: 'bg-rose-50 text-rose-700 border-rose-100' },
+                  { title: 'Testimonies Awaiting Approval', count: pendingTestimonials, color: 'bg-amber-50 text-amber-700 border-amber-100' },
                 ].map((stat, i) => (
                   <div key={i} className={`p-6 rounded-2xl border ${stat.color}`}>
                     <div className="text-xs font-bold tracking-wider uppercase mb-2 opacity-80">{stat.title}</div>
@@ -347,6 +380,43 @@ export default function Admin() {
                   </div>
                 ))}
                 {currentList.length === 0 && <div className="text-slate-500 text-center py-10 text-sm font-medium">No items found. Add one above.</div>}
+              </div>
+            )}
+
+            {activeTab === 'Testimonials' && (
+              <div className="space-y-4">
+                <p className="text-sm text-slate-500 font-medium">
+                  Testimonies submitted by visitors stay hidden until you approve them.
+                </p>
+                {(data.testimonials || []).map(t => (
+                  <div key={t.id} className={`p-5 rounded-2xl border transition-all ${t.isApproved ? 'border-slate-200' : 'border-amber-300 bg-amber-50/50'}`}>
+                    <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-3 flex-wrap">
+                          <h4 className="font-bold text-slate-900 text-lg">{t.name}</h4>
+                          <span className={`text-xs font-bold px-2.5 py-1 rounded-full ${t.isApproved ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}`}>
+                            {t.isApproved ? 'Approved' : 'Pending approval'}
+                          </span>
+                        </div>
+                        <p className="text-sm font-medium text-slate-500">{t.role} · {new Date(t.createdAt).toLocaleDateString()}</p>
+                        <p className="text-slate-700 mt-3 whitespace-pre-line break-words">{t.text}</p>
+                      </div>
+                      <div className="flex items-center gap-2 shrink-0">
+                        {t.isApproved ? (
+                          <button onClick={() => setApproval(t.id, false)} className="flex items-center px-4 py-2 text-sm font-bold rounded-full border border-slate-200 text-slate-600 hover:bg-slate-50 transition-colors">
+                            <EyeOff className="w-4 h-4 mr-2" /> Unpublish
+                          </button>
+                        ) : (
+                          <button onClick={() => setApproval(t.id, true)} className="flex items-center px-4 py-2 text-sm font-bold rounded-full bg-emerald-600 text-white hover:bg-emerald-700 transition-colors shadow-sm">
+                            <Check className="w-4 h-4 mr-2" /> Approve
+                          </button>
+                        )}
+                        <button onClick={() => handleDelete('testimonials', t.id)} className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"><Trash2 className="w-4 h-4" /></button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+                {(data.testimonials || []).length === 0 && <div className="text-slate-500 text-center py-10 text-sm font-medium">No testimonies submitted yet.</div>}
               </div>
             )}
 

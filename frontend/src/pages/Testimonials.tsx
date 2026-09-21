@@ -6,14 +6,23 @@ import ScrollReveal from '../components/ScrollReveal';
 import { getApiUrl } from '../utils/api';
 
 export default function Testimonials() {
-  const [testimonials, setTestimonials] = useState([]);
+  const [testimonials, setTestimonials] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch(getApiUrl('/api/quotes'))
-      .then(res => res.json())
-      .then(data => setTestimonials(data))
-      .catch(err => console.error(err))
+    const load = (path: string) =>
+      fetch(getApiUrl(path))
+        .then(res => (res.ok ? res.json() : []))
+        .catch(() => []);
+
+    // Approved visitor testimonies (the API never returns pending ones), then the dashboard quotes.
+    Promise.all([load('/api/testimonials'), load('/api/quotes')])
+      .then(([approved, quotes]) =>
+        setTestimonials([
+          ...approved.map((t: any) => ({ id: `t-${t.id}`, author: t.name, role: t.role, text: t.text })),
+          ...quotes,
+        ])
+      )
       .finally(() => setLoading(false));
   }, []);
 

@@ -50,8 +50,18 @@ export default function Home() {
   }, []);
 
   const [showAllQuotes, setShowAllQuotes] = useState(false);
-  
-  const allQuotes = [
+  const [apiQuotes, setApiQuotes] = useState<{ quote: string; author: string }[]>([]);
+
+  // Quotes added in the admin dashboard (/api/quotes: { id, text, author }).
+  useEffect(() => {
+    fetch(getApiUrl('/api/quotes'))
+      .then(res => res.json())
+      .then((data: any[]) => setApiQuotes(data.map(q => ({ quote: q.text, author: q.author }))))
+      .catch(err => console.error(err));
+  }, []);
+
+  // Built-in quotes are shown until at least one quote exists in the dashboard.
+  const defaultQuotes = [
     { quote: "Code is read more often than it is written. Write it for the reader.", author: "Nsame Rene" },
     { quote: "Simplicity is the soul of efficiency.", author: "Austin Freeman" },
     { quote: "Mathematics is the language with which God has written the universe.", author: "Galileo Galilei" },
@@ -62,6 +72,7 @@ export default function Home() {
     { quote: "The only way to do great work is to love what you do.", author: "Steve Jobs" },
   ];
 
+  const allQuotes = apiQuotes.length > 0 ? apiQuotes : defaultQuotes;
   const displayedQuotes = showAllQuotes ? allQuotes : allQuotes.slice(0, 4);
 
   return (
