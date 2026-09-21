@@ -3,9 +3,11 @@ from rest_framework import viewsets
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
+from rest_framework.throttling import ScopedRateThrottle
 from rest_framework.views import APIView
 
-from apps.core.permissions import IsStaff
+from apps.core.notifications import notify_owner
+from apps.core.permissions import IsStaff, is_admin
 
 from . import serializers as s
 from .models import (
@@ -19,6 +21,7 @@ from .models import (
     Quote,
     SiteSettings,
     Skill,
+    Testimonial,
     WhatIDo,
 )
 
@@ -107,6 +110,50 @@ class GalleryViewSet(ContentViewSet):
 class WhatIDoViewSet(ContentViewSet):
     queryset = WhatIDo.objects.all()
     serializer_class = s.WhatIDoSerializer
+
+
+class TestimonialViewSet(ContentViewSet):
+    """Visitor testimonies with owner approval.
+
+    * GET  /api/testimonials        public: approved only. Staff (Bearer token) see all,
+                                    pending first, with ``isApproved``.
+    * POST /api/testimonials        public, rate-limited. Always saved as *pending*.
+    * PATCH|PUT /api/testimonials/<id>  staff: approve / unapprove / edit ({"isApproved": true}).
+    * DELETE /api/testimonials/<id>     staff.
+    """
+
+    queryset = Testimonial.objects.all()
+    serializer_class = s.TestimonialSerializer
+    throttle_scope = "testimonial"
+
+    def get_permissions(self):
+        if self.action in ("list", "retrieve", "create"):
+            return [AllowAny()]
+        return [IsStaff()]
+
+    def get_throttles(self):
+        return [ScopedRateThrottle()] if self.action == "create" else []
+
+    def get_serializer_class(self):
+        return s.TestimonialSubmitSerializer if self.action == "create" else s.TestimonialSerializer
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        if is_admin(self.request.user):
+            return queryset.order_by("is_approved", "-created_at", "-id")  # pending first
+        return queryset.filter(is_approved=True)
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        testimonial = serializer.save(is_approved=False)
+        notify_owner(
+            f"New testimony from {testimonial.name} awaits approval",
+            f"{testimonial.name} ({testimonial.role}) submitted a testimony:\n\n"
+            f"{testimonial.text}\n\n"
+            "Approve it in the dashboard (Testimonials tab) or in Django admin.",
+        )
+        return Response({"success": True, "status": "pending"}, status=201)
 
 
 class SettingsView(APIView):

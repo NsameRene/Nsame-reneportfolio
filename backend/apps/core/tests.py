@@ -136,7 +136,7 @@ class AdminSiteTests(TestCase):
             if obj is not None:
                 self.assertEqual(self.client.get(f"{base}{obj.pk}/change/").status_code, 200, base + "change")
             checked += 1
-        self.assertEqual(checked, 12)  # 11 content models + contact messages
+        self.assertEqual(checked, 13)  # 12 content models + contact messages
 
     def test_settings_admin_is_a_singleton(self):
         from apps.content.admin import SiteSettingsAdmin

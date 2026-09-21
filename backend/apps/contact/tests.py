@@ -57,8 +57,8 @@ class ContactTests(APITestCase):
     def test_email_failure_does_not_lose_message(self):
         from unittest import mock
 
-        with mock.patch("apps.contact.views.send_mail", side_effect=OSError("smtp down")):
-            with self.assertLogs("apps.contact.views", level="ERROR"):
+        with mock.patch("apps.core.notifications.send_mail", side_effect=OSError("smtp down")):
+            with self.assertLogs("apps.core.notifications", level="ERROR"):
                 response = self.client.post("/api/contact", FORM, format="json")
         self.assertEqual(response.status_code, 200)
         self.assertEqual(ContactMessage.objects.count(), 1)

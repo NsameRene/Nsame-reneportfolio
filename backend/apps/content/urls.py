@@ -14,6 +14,7 @@ router.register("certificates", views.CertificateViewSet, basename="certificate"
 router.register("courses", views.CourseViewSet, basename="course")
 router.register("quotes", views.QuoteViewSet, basename="quote")
 router.register("gallery", views.GalleryViewSet, basename="gallery")
+router.register("testimonials", views.TestimonialViewSet, basename="testimonial")
 router.register("what_i_do", views.WhatIDoViewSet, basename="what-i-do")
 
 urlpatterns = [path("settings", views.SettingsView.as_view()), *router.urls]

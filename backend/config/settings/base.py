@@ -130,6 +130,7 @@ REST_FRAMEWORK = {
     "DEFAULT_THROTTLE_RATES": {
         "login": env("THROTTLE_LOGIN", "10/min"),
         "contact": env("THROTTLE_CONTACT", "10/hour"),
+        "testimonial": env("THROTTLE_TESTIMONIAL", "10/hour"),
     },
     "EXCEPTION_HANDLER": "apps.core.exceptions.api_exception_handler",
     "UNAUTHENTICATED_USER": "django.contrib.auth.models.AnonymousUser",

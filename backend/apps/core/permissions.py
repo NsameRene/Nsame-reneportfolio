@@ -1,7 +1,7 @@
 from rest_framework.permissions import SAFE_METHODS, BasePermission
 
 
-def _is_admin(user):
+def is_admin(user):
     return bool(user and user.is_authenticated and user.is_active and user.is_staff)
 
 
@@ -13,9 +13,9 @@ class IsStaffOrReadOnly(BasePermission):
     """
 
     def has_permission(self, request, view):
-        return request.method in SAFE_METHODS or _is_admin(request.user)
+        return request.method in SAFE_METHODS or is_admin(request.user)
 
 
 class IsStaff(BasePermission):
     def has_permission(self, request, view):
-        return _is_admin(request.user)
+        return is_admin(request.user)

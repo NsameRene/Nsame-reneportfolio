@@ -41,7 +41,7 @@ backend/
     ├── core/             permissions, error format, validators, camelCase/media serializers
     ├── accounts/         POST /api/auth/login, /api/auth/check  (JWT)
     ├── content/          Project, Blog, Skill, Experience, Education, Certificate,
-    │                     Course, Quote, GalleryItem, WhatIDo, SiteSettings + admin + API
+    │                     Course, Quote, Testimonial, GalleryItem, WhatIDo, SiteSettings + admin + API
     │                     + commands: import_legacy, seed_demo
     └── contact/          ContactMessage + POST /api/contact + admin inbox
 ```
@@ -97,7 +97,7 @@ npm run dev                          # talks to http://127.0.0.1:8000 by default
 
 ```bash
 cd backend
-python manage.py test --settings=config.settings.test     # 60 tests
+python manage.py test --settings=config.settings.test     # 71 tests
 cd ../frontend && npm run build                             # typecheck + production build
 ```
 
@@ -308,6 +308,7 @@ Optional `?…` filters do not exist; the frontend filters client-side.
 | `/api/quotes` | `id, text, author` |
 | `/api/gallery` | `id, title, imageUrl, createdAt` |
 | `/api/what_i_do` | `id, title, icon, items` (comma-separated) |
+| `/api/testimonials` | approved visitor testimonies only, see [Visitor testimonies](#visitor-testimonies-owner-approval-required) |
 | `/api/settings` | `id, name, email, bio, profileImageUrl, phone, location, website` |
 | `/api/health` | `{ "status": "ok" }` |
 
@@ -326,6 +327,22 @@ otherwise the external URL you entered.
 `<resource>` ∈ `projects, blogs, skills, experiences, education, certificates, courses, quotes, gallery, what_i_do`.
 Uploads: jpg/jpeg/png/gif/webp only (SVG rejected), verified with Pillow, max 5 MB (`MAX_UPLOAD_SIZE_MB`).
 Links must be `http(s)://…`, a `/relative/path` or `#`.
+
+### Visitor testimonies (owner approval required)
+
+A testimony submitted from the home page is stored as **pending** and is invisible to the public until
+you approve it, either in the React dashboard (**Testimonials** tab: *Approve* / *Unpublish* / *Delete*,
+with a pending counter) or in Django Admin → *Testimonials* (tick **approved**, or use the bulk actions).
+If `CONTACT_NOTIFY_EMAIL` is set you also get an email for each new submission.
+
+| Endpoint | Method | Purpose | Auth | Request body | Response |
+|---|---|---|---|---|---|
+| `/api/testimonials` | GET | List testimonies | – (approved only) · Admin (all, pending first) | – | `[ { id, name, role, text, isApproved, createdAt } ]` |
+| `/api/testimonials` | POST | Submit a testimony | – | `{ "name" (≤120), "role"? (≤120, default "Client"), "text" (10–1500 chars) }` | `201 { "success": true, "status": "pending" }` · `400` validation · `429` after 10/hour per IP. `isApproved` in the body is ignored. |
+| `/api/testimonials/<id>` | PATCH / PUT | Approve, unpublish or edit | Admin | `{ "isApproved": true }` | `200` the updated object |
+| `/api/testimonials/<id>` | DELETE | Delete | Admin | – | `200 { "success": true }` |
+
+`/testimonials` ("See All") lists approved testimonies followed by the dashboard **Quotes**.
 
 ### Contact form
 
@@ -353,6 +370,10 @@ Links must be `http(s)://…`, a `/relative/path` or `#`.
 * Empty `projects`/`blogs` tables return `[]` (Node injected hard-coded demo rows). Use `python manage.py seed_demo`.
 * Create returns `201` (Node `200`); `PUT` is a partial update, which also fixes the admin panel
   resetting `featured`/`readingTime` on every edit.
+* Testimonies: the old "Add Testimony" button only added a card in the visitor's own browser tab (lost on
+  refresh, never saved). It now posts to the API and waits for your approval; the three Lorem Ipsum demo
+  testimonies were removed.
+* Home "Quotes & Principles" shows the dashboard Quotes (built-in quotes only while you have none).
 * Contact form: the frontend sends no `subject`; Node required one and failed with `500`. Django
   generates one and also stores `projectType` and `budget`.
 * Frontend changes (only what the migration required): `src/utils/api.ts` (env-driven URL, no hard-coded

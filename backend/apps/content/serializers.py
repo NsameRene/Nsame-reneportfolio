@@ -14,6 +14,7 @@ from .models import (
     Quote,
     SiteSettings,
     Skill,
+    Testimonial,
     WhatIDo,
 )
 
@@ -115,3 +116,38 @@ class SiteSettingsSerializer(MediaSerializer):
             "phone", "location", "website",
         ]
         read_only_fields = ["id"]
+
+
+class TestimonialSerializer(CamelCaseModelSerializer):
+    """Full record. ``is_approved`` is writable, but only staff can reach the
+    update endpoints (see TestimonialViewSet)."""
+
+    class Meta:
+        model = Testimonial
+        fields = ["id", "name", "role", "text", "is_approved", "created_at"]
+        read_only_fields = ["id", "created_at"]
+
+
+class TestimonialSubmitSerializer(CamelCaseModelSerializer):
+    """What a visitor may send. ``is_approved`` is deliberately absent, so a
+    submission can never approve itself."""
+
+    class Meta:
+        model = Testimonial
+        fields = ["name", "role", "text"]
+        extra_kwargs = {"role": {"required": False, "allow_blank": True}}
+
+    def validate_name(self, value):
+        value = value.strip()
+        if not value:
+            raise serializers.ValidationError("This field may not be blank.")
+        return value
+
+    def validate_text(self, value):
+        value = value.strip()
+        if len(value) < 10:
+            raise serializers.ValidationError("Please write at least 10 characters.")
+        return value
+
+    def validate_role(self, value):
+        return value.strip() or "Client"  # the site's existing default label

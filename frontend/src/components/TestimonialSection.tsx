@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { X, Plus, List, Star } from 'lucide-react';
+import { X, Plus, List, Star, CheckCircle } from 'lucide-react';
 import { Link } from 'react-router';
+import { getApiUrl } from '../utils/api';
 
 interface Testimonial {
   id: string;
@@ -55,22 +56,61 @@ export default function TestimonialSection() {
   const [readMoreTestimonial, setReadMoreTestimonial] = useState<Testimonial | null>(null);
 
   const [formData, setFormData] = useState({ name: '', role: '', text: '' });
+  const [submitState, setSubmitState] = useState<'idle' | 'sending' | 'sent'>('idle');
+  const [submitError, setSubmitError] = useState('');
 
-  const handleAddTestimony = (e: React.FormEvent) => {
+  // Only testimonies the owner has approved are returned by the API.
+  useEffect(() => {
+    fetch(getApiUrl('/api/testimonials'))
+      .then(res => (res.ok ? res.json() : []))
+      .then((data: any[]) =>
+        setTestimonials(
+          data.map(t => ({
+            id: String(t.id),
+            name: t.name,
+            role: t.role || 'Client',
+            text: t.text,
+            date: Date.parse(t.createdAt) || 0,
+          }))
+        )
+      )
+      .catch(err => console.error(err));
+  }, []);
+
+  const closeAddModal = () => {
+    setIsAddModalOpen(false);
+    setSubmitState('idle');
+    setSubmitError('');
+  };
+
+  // A submission is saved as "pending": it is NOT shown until the owner approves it.
+  const handleAddTestimony = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.name || !formData.text) return;
-    
-    const newTestimonial: Testimonial = {
-      id: Date.now().toString(),
-      name: formData.name,
-      role: formData.role || 'Client',
-      text: formData.text,
-      date: Date.now()
-    };
-    
-    setTestimonials([newTestimonial, ...testimonials]);
-    setFormData({ name: '', role: '', text: '' });
-    setIsAddModalOpen(false);
+
+    setSubmitState('sending');
+    setSubmitError('');
+    try {
+      const res = await fetch(getApiUrl('/api/testimonials'), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        const details = body.details ? Object.values(body.details).flat().join(' ') : '';
+        throw new Error(
+          res.status === 429
+            ? 'Too many submissions. Please try again later.'
+            : details || body.error || 'Something went wrong. Please try again.'
+        );
+      }
+      setFormData({ name: '', role: '', text: '' });
+      setSubmitState('sent');
+    } catch (err: any) {
+      setSubmitError(err.message || 'Something went wrong. Please try again.');
+      setSubmitState('idle');
+    }
   };
 
   const allTestimonialsSorted = [...testimonials].sort((a, b) => b.date - a.date);
@@ -125,20 +165,38 @@ export default function TestimonialSection() {
             <motion.div 
               initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
               className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm"
-              onClick={() => setIsAddModalOpen(false)}
+              onClick={closeAddModal}
             />
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
               className="bg-white rounded-3xl p-8 max-w-md w-full relative z-10 shadow-2xl"
             >
               <button 
-                onClick={() => setIsAddModalOpen(false)}
+                onClick={closeAddModal}
                 className="absolute top-6 right-6 text-slate-400 hover:text-slate-600"
               >
                 <X className="w-6 h-6" />
               </button>
+              {submitState === 'sent' ? (
+                <div className="text-center py-6">
+                  <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-5">
+                    <CheckCircle className="w-8 h-8 text-emerald-600" />
+                  </div>
+                  <h3 className="text-2xl font-bold text-slate-900 mb-3">Thank you!</h3>
+                  <p className="text-slate-600 mb-6">
+                    Your testimony has been received. It will appear on the site once it has been approved.
+                  </p>
+                  <button
+                    onClick={closeAddModal}
+                    className="px-8 py-3 rounded-xl bg-slate-900 text-white font-bold hover:bg-slate-800 transition-colors"
+                  >
+                    Close
+                  </button>
+                </div>
+              ) : (
+              <>
               <h3 className="text-2xl font-bold text-slate-900 mb-6">Add Your Testimony</h3>
               <form onSubmit={handleAddTestimony} className="space-y-4">
                 <div>
@@ -165,13 +223,20 @@ export default function TestimonialSection() {
                     value={formData.text} onChange={e => setFormData({...formData, text: e.target.value})}
                   ></textarea>
                 </div>
-                <button 
+                <p className="text-xs text-slate-500">Your testimony will be shown after it has been reviewed and approved.</p>
+                {submitError && (
+                  <div className="text-red-600 text-sm bg-red-50 p-3 rounded-xl border border-red-100 font-medium">{submitError}</div>
+                )}
+                <button
                   type="submit"
-                  className="w-full py-4 rounded-xl bg-slate-900 text-white font-bold hover:bg-slate-800 transition-colors mt-2"
+                  disabled={submitState === 'sending'}
+                  className="w-full py-4 rounded-xl bg-slate-900 text-white font-bold hover:bg-slate-800 transition-colors mt-2 disabled:opacity-60"
                 >
-                  Submit
+                  {submitState === 'sending' ? 'Submitting...' : 'Submit'}
                 </button>
               </form>
+              </>
+              )}
             </motion.div>
           </div>
         )}

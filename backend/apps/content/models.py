@@ -208,3 +208,22 @@ class SiteSettings(models.Model):
     def load(cls):
         obj, _ = cls.objects.get_or_create(pk=1)
         return obj
+
+
+class Testimonial(models.Model):
+    """A testimony submitted by a visitor. It stays hidden from the public
+    site until the owner approves it (dashboard or Django admin)."""
+
+    name = models.CharField(max_length=120)
+    role = models.CharField("role / company", max_length=120, blank=True)
+    text = models.TextField("testimony", max_length=1500)
+    is_approved = models.BooleanField(
+        "approved", default=False, db_index=True, help_text="Only approved testimonies appear on the public site."
+    )
+    created_at = models.DateTimeField("submitted at", auto_now_add=True)
+
+    class Meta:
+        ordering = ["-created_at", "-id"]
+
+    def __str__(self):
+        return f"{self.name} ({'approved' if self.is_approved else 'pending'})"

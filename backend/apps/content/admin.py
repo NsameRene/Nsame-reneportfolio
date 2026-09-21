@@ -11,6 +11,7 @@ from .models import (
     Quote,
     SiteSettings,
     Skill,
+    Testimonial,
     WhatIDo,
 )
 
@@ -136,3 +137,37 @@ class SiteSettingsAdmin(admin.ModelAdmin):
 
     def has_delete_permission(self, request, obj=None):
         return False
+
+
+@admin.register(Testimonial)
+class TestimonialAdmin(admin.ModelAdmin):
+    """Moderation queue for visitor testimonies. Pending ones are listed first;
+    tick "approved" (or use the bulk action) to publish."""
+
+    list_display = ("name", "role", "short_text", "is_approved", "created_at")
+    list_display_links = ("name",)
+    list_editable = ("is_approved",)
+    list_filter = ("is_approved", "created_at")
+    search_fields = ("name", "role", "text")
+    date_hierarchy = "created_at"
+    ordering = ("is_approved", "-created_at")  # pending first
+    actions = ["approve", "unapprove"]
+    readonly_fields = ("created_at",)
+    fieldsets = (
+        (None, {"fields": ("name", "role", "text")}),
+        ("Moderation", {"fields": ("is_approved", "created_at")}),
+    )
+
+    @admin.display(description="Testimony")
+    def short_text(self, obj):
+        return obj.text if len(obj.text) <= 80 else obj.text[:77] + "..."
+
+    @admin.action(description="Approve selected testimonies (publish)")
+    def approve(self, request, queryset):
+        updated = queryset.update(is_approved=True)
+        self.message_user(request, f"{updated} testimony(ies) approved.")
+
+    @admin.action(description="Unapprove selected testimonies (hide)")
+    def unapprove(self, request, queryset):
+        updated = queryset.update(is_approved=False)
+        self.message_user(request, f"{updated} testimony(ies) hidden.")
