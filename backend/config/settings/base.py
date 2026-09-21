@@ -73,10 +73,11 @@ TEMPLATES = [
 #   mysql://USER:PASSWORD@HOST/NAME          (needs the mysqlclient package)
 #   postgres://USER:PASSWORD@HOST:5432/NAME  (needs psycopg)
 # Percent-encode special characters in the password (and "$" as %24 in names).
+# env() treats a blank `DATABASE_URL=` (as copied from .env.example) like an unset variable;
+# dj_database_url.config() would return an empty dict for it and Django would crash.
 DATABASES = {
-    "default": dj_database_url.config(
-        env="DATABASE_URL",
-        default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}",
+    "default": dj_database_url.parse(
+        env("DATABASE_URL") or f"sqlite:///{BASE_DIR / 'db.sqlite3'}",
         conn_max_age=env_int("DB_CONN_MAX_AGE", 0),
         conn_health_checks=True,
     )

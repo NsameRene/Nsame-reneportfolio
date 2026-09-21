@@ -159,3 +159,29 @@ class _Req:
         from django.contrib.auth import get_user_model
 
         self.user = get_user_model().objects.get(username="owner")
+
+
+class DatabaseSettingsTests(TestCase):
+    """Settings are evaluated at import time, so check them in a fresh interpreter."""
+
+    def engine_with(self, **env_vars):
+        import os
+        import subprocess
+        import sys
+
+        env = {k: v for k, v in os.environ.items() if k != "DATABASE_URL"}
+        env.update(DJANGO_SETTINGS_MODULE="config.settings.local", **env_vars)
+        code = "from django.conf import settings; d = settings.DATABASES['default']; print(d['ENGINE'], d['NAME'])"
+        result = subprocess.run([sys.executable, "-c", code], env=env, capture_output=True, text=True, cwd=str(Path(__file__).resolve().parents[2]))
+        self.assertEqual(result.returncode, 0, result.stderr)
+        return result.stdout.strip()
+
+    def test_unset_and_blank_database_url_both_use_the_sqlite_file(self):
+        for value in (None, "", "   "):
+            env_vars = {} if value is None else {"DATABASE_URL": value}
+            out = self.engine_with(**env_vars)
+            self.assertTrue(out.startswith("django.db.backends.sqlite3 "), (value, out))
+            self.assertTrue(out.endswith("db.sqlite3"), (value, out))
+
+    def test_explicit_sqlite_url_is_used(self):
+        self.assertIn("custom.sqlite3", self.engine_with(DATABASE_URL="sqlite:////tmp/custom.sqlite3"))
