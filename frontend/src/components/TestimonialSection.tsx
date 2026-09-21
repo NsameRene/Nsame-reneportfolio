@@ -11,11 +11,7 @@ interface Testimonial {
   date: number;
 }
 
-const initialTestimonials: Testimonial[] = [
-  { id: '1', name: "James D. Kelly", role: "Founder", text: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s.", date: Date.now() - 100000 },
-  { id: '2', name: "Joanna S. Brown", role: "CEO", text: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s.", date: Date.now() - 200000 },
-  { id: '3', name: "Jason E. George", role: "Manager", text: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s.", date: Date.now() - 300000 },
-];
+const initialTestimonials: Testimonial[] = [];
 
 const TestimonialCard: React.FC<{ testimonial: Testimonial, onClickReadMore: (t: Testimonial) => void }> = ({ testimonial, onClickReadMore }) => {
   const words = testimonial.text.trim().split(/\s+/);
@@ -104,6 +100,8 @@ export default function TestimonialSection() {
         </div>
       </div>
 
+      {testimonials.length > 0 && (
+        <>
       {/* Marquee Animation */}
       <div className="relative flex overflow-x-hidden w-full py-8 group" style={{ maskImage: 'linear-gradient(to right, transparent, black 10%, black 90%, transparent)' }}>
         <div className="flex animate-[marquee_30s_linear_infinite] group-hover:[animation-play-state:paused] will-change-transform w-max">
@@ -117,6 +115,8 @@ export default function TestimonialSection() {
           ))}
         </div>
       </div>
+        </>
+      )}
 
       {/* Add Testimony Modal */}
       <AnimatePresence>
