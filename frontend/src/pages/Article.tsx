@@ -2,6 +2,8 @@ import { useParams, Link } from 'react-router';
 import { motion } from 'motion/react';
 import { ArrowLeft, Calendar, Clock } from 'lucide-react';
 import ScrollReveal from '../components/ScrollReveal';
+import { useEffect, useState } from 'react';
+import { getApiUrl } from '../utils/api';
 
 const blogPosts = [
   { 
@@ -42,9 +44,39 @@ const blogPosts = [
   }
 ];
 
+// Maps a post from GET /api/blogs/:slugOrId onto the shape this page renders.
+const fromApi = (p: any) => ({
+  id: p.id,
+  title: p.title,
+  category: p.category,
+  date: p.publishedAt
+    ? new Date(p.publishedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+    : '',
+  readTime: `${p.readingTime || 5} min read`,
+  content: p.content,
+  img: p.coverImage || 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80',
+});
+
 export default function Article() {
   const { id } = useParams();
-  const post = blogPosts.find(p => p.id === Number(id));
+  const [apiPost, setApiPost] = useState<ReturnType<typeof fromApi> | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  // The blog list links to /blog/<slug>; the home page links to /blog/<id>.
+  useEffect(() => {
+    setLoading(true);
+    fetch(getApiUrl(`/api/blogs/${encodeURIComponent(id || '')}`))
+      .then(res => (res.ok ? res.json() : null))
+      .then(data => setApiPost(data ? fromApi(data) : null))
+      .catch(() => setApiPost(null))
+      .finally(() => setLoading(false));
+  }, [id]);
+
+  const post = apiPost || blogPosts.find(p => p.id === Number(id));
+
+  if (loading && !post) {
+    return <div className="py-24 text-center text-slate-500 font-medium min-h-[60vh]">Loading article...</div>;
+  }
 
   if (!post) {
     return (

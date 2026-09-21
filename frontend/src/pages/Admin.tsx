@@ -137,11 +137,17 @@ export default function Admin() {
     }
 
     try {
-      await fetch(url, {
+      const res = await fetch(url, {
         method,
         headers: { 'Authorization': `Bearer ${token}` },
         body: formData
       });
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        const details = body.details ? Object.entries(body.details).map(([k, v]) => `${k}: ${v}`).join('\n') : '';
+        alert(`Error saving item: ${body.error || res.status}${details ? `\n${details}` : ''}`);
+        return;
+      }
       setIsModalOpen(false);
       fetchItems();
     } catch (err) {

@@ -1,8 +1,20 @@
 /// <reference types="vite/client" />
 
-const DEFAULT_API_URL = 'https://nsame-reneportfolio.onrender.com';
+// Single place that knows where the Django API lives.
+//   Development: http://127.0.0.1:8000 (`python manage.py runserver`)
+//   Production : set VITE_API_URL in Vercel, e.g. https://YOUR_USERNAME.pythonanywhere.com
+const DEV_API_URL = 'http://127.0.0.1:8000';
 
-export const API_BASE = (import.meta.env.VITE_API_URL || DEFAULT_API_URL).replace(/\/$/, '');
+const configuredUrl = (import.meta.env.VITE_API_URL || (import.meta.env.DEV ? DEV_API_URL : '')).replace(/\/$/, '');
+
+if (!configuredUrl) {
+  console.error(
+    'VITE_API_URL is not set. Set it to your Django API URL (e.g. https://YOUR_USERNAME.pythonanywhere.com) ' +
+      'in the Vercel project settings and redeploy.'
+  );
+}
+
+export const API_BASE = configuredUrl;
 
 export function getApiUrl(path: string) {
   const normalizedPath = path.startsWith('/') ? path : `/${path}`;
