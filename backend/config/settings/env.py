@@ -7,8 +7,11 @@ _TRUE = {"1", "true", "yes", "on"}
 
 
 def env(name, default=None):
+    """Value of an environment variable; unset, blank or whitespace-only means "use the default"."""
     value = os.environ.get(name)
-    return default if value is None or value == "" else value
+    if value is None or value.strip() == "":
+        return default
+    return value.strip()
 
 
 def env_required(name):
