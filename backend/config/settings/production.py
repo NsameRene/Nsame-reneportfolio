@@ -19,10 +19,13 @@ if not SECRET_KEY or SECRET_KEY.startswith("insecure"):
     raise ImproperlyConfigured("SECRET_KEY must be set to a long random value in production.")
 if not ALLOWED_HOSTS:
     raise ImproperlyConfigured("ALLOWED_HOSTS must be set (e.g. YOUR_USERNAME.pythonanywhere.com).")
-if not env("DATABASE_URL"):
-    raise ImproperlyConfigured("DATABASE_URL must be set in production.")
 if not (CORS_ALLOWED_ORIGINS or CORS_ALLOWED_ORIGIN_REGEXES):
     raise ImproperlyConfigured("FRONTEND_URL must be set so the Vercel frontend may call this API.")
+
+# ── Database ────────────────────────────────────────────────────────────────
+# DATABASE_URL is optional: without it the site uses the SQLite file
+# backend/db.sqlite3 (persistent on PythonAnywhere, including the free plan).
+# It is git-ignored and never served over the web. Back it up (see README).
 
 # ── HTTPS & cookies ─────────────────────────────────────────────────────────
 # PythonAnywhere terminates TLS in front of the app and forwards this header.
