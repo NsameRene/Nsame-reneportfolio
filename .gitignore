@@ -17,3 +17,4 @@ backend/staticfiles/
 backend/media/
 .runserver.log
 .prod.log
+venv/

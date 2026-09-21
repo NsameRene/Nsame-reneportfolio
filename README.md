@@ -253,6 +253,20 @@ months, and free accounts can only make outbound requests to allow-listed hosts
 (relevant for contact-form email; Gmail's SMTP server is normally on the list,
 check their current allow-list).
 
+### Troubleshooting
+
+Always read the **error log** first (Web tab → *Error log*).
+
+| Error in the log | Cause and fix |
+|---|---|
+| `'Settings' object has no attribute 'ROOT_URLCONF'` | The WSGI file points at the wrong settings module (usually `config.settings`, or PythonAnywhere's default `mysite.settings`). It must say `os.environ["DJANGO_SETTINGS_MODULE"] = "config.settings.production"`. Replace the **whole** WSGI file with `backend/pythonanywhere_wsgi.py`, then Reload. |
+| `ModuleNotFoundError: No module named 'config'` | `PROJECT_HOME` in the WSGI file is wrong. It must be the folder that contains `manage.py`, e.g. `/home/YOUR_USERNAME/Nsame-reneportfolio/backend`. |
+| `ModuleNotFoundError: No module named 'django'` (or `rest_framework`, `dotenv`, …) | The Web tab **Virtualenv** path is not set or points at the wrong folder. It must be the virtualenv you ran `pip install -r requirements.txt` in. |
+| `ImproperlyConfigured: SECRET_KEY / ALLOWED_HOSTS / DATABASE_URL / FRONTEND_URL must be set` | `backend/.env` is missing, misspelled, or in the wrong folder. It must be `backend/.env` (next to `manage.py`). |
+| `django.db.utils.OperationalError: (1045, "Access denied…")` or `(2002, …)` | Wrong DB user/password/host in `DATABASE_URL`. Copy the values from the Databases tab and percent-encode special characters in the password. |
+| Admin pages have no CSS | Run `python manage.py collectstatic --noinput` and check the `/static/` mapping on the Web tab. |
+| Browser console: `blocked by CORS policy` | `FRONTEND_URL` on PythonAnywhere does not exactly match the Vercel URL (scheme included, no trailing slash). Fix it and Reload. |
+
 ### 9. Optional: email yourself contact-form messages
 Messages are always stored and visible in Django Admin → *Contact messages*. To also get an
 email, set `EMAIL_HOST`, `EMAIL_PORT`, `EMAIL_HOST_USER`, `EMAIL_HOST_PASSWORD`
